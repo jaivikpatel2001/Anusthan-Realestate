@@ -1,0 +1,1069 @@
+{
+	"info": {
+		"_postman_id": "12345678-1234-1234-1234-123456789012",
+		"name": "Real Estate API",
+		"description": "Comprehensive API collection for Real Estate Management System with authentication, project management, apartment configuration, lead management, and site settings.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12345678"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@realstate.com\",\n  \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/auth/login",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Login with email and password to get access token"
+					},
+					"response": []
+				},
+				{
+					"name": "Register User (Admin Only)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"user\"\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/auth/register",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						},
+						"description": "Register a new user (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/auth/me",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"me"
+							]
+						},
+						"description": "Get current user profile"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"John Updated\",\n  \"email\": \"john.updated@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/auth/profile",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"profile"
+							]
+						},
+						"description": "Update user profile"
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"currentPassword\": \"oldpassword123\",\n  \"newPassword\": \"newpassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/auth/change-password",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"change-password"
+							]
+						},
+						"description": "Change user password"
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refreshToken\": \"{{REFRESH_TOKEN}}\"\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/auth/refresh",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"refresh"
+							]
+						},
+						"description": "Refresh access token using refresh token"
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/auth/logout",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"logout"
+							]
+						},
+						"description": "Logout user and invalidate refresh token"
+					},
+					"response": []
+				}
+			],
+			"description": "Authentication endpoints for login, registration, profile management, and token handling"
+		},
+		{
+			"name": "Projects",
+			"item": [
+				{
+					"name": "Get All Projects",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/projects?page=1&limit=10&status=&category=&location=&minPrice=&maxPrice=&search=&sort=-createdAt&featured=",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"projects"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Page number for pagination"
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Number of projects per page"
+								},
+								{
+									"key": "status",
+									"value": "",
+									"description": "Filter by status: upcoming, ongoing, completed"
+								},
+								{
+									"key": "category",
+									"value": "",
+									"description": "Filter by category: residential, commercial, mixed"
+								},
+								{
+									"key": "location",
+									"value": "",
+									"description": "Filter by location (partial match)"
+								},
+								{
+									"key": "minPrice",
+									"value": "",
+									"description": "Minimum starting price"
+								},
+								{
+									"key": "maxPrice",
+									"value": "",
+									"description": "Maximum starting price"
+								},
+								{
+									"key": "search",
+									"value": "",
+									"description": "Text search in title, description, location"
+								},
+								{
+									"key": "sort",
+									"value": "-createdAt",
+									"description": "Sort field (prefix with - for descending)"
+								},
+								{
+									"key": "featured",
+									"value": "",
+									"description": "Filter featured projects: true/false"
+								}
+							]
+						},
+						"description": "Get all projects with filtering, sorting, and pagination"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Project by ID/Slug",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/projects/{{PROJECT_ID}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"projects",
+								"{{PROJECT_ID}}"
+							]
+						},
+						"description": "Get single project by ID or slug"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Project (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Luxury Apartments Downtown\",\n  \"description\": \"Premium residential project with modern amenities and excellent connectivity.\",\n  \"shortDescription\": \"Premium residential project in prime location\",\n  \"location\": \"Downtown, Mumbai\",\n  \"address\": {\n    \"street\": \"123 Main Street\",\n    \"city\": \"Mumbai\",\n    \"state\": \"Maharashtra\",\n    \"zipCode\": \"400001\",\n    \"country\": \"India\"\n  },\n  \"status\": \"ongoing\",\n  \"category\": \"residential\",\n  \"startingPrice\": 50000000,\n  \"maxPrice\": 120000000,\n  \"totalUnits\": 200,\n  \"heroImage\": \"https://example.com/hero-image.jpg\",\n  \"images\": [\n    {\n      \"url\": \"https://example.com/image1.jpg\",\n      \"caption\": \"Building exterior\",\n      \"isHero\": false\n    }\n  ],\n  \"amenities\": [\n    {\n      \"name\": \"Swimming Pool\",\n      \"icon\": \"pool\",\n      \"description\": \"Olympic size swimming pool\"\n    },\n    {\n      \"name\": \"Gym\",\n      \"icon\": \"fitness\",\n      \"description\": \"Fully equipped fitness center\"\n    }\n  ],\n  \"features\": [\"24/7 Security\", \"Power Backup\", \"Parking\"],\n  \"specifications\": {\n    \"totalFloors\": 25,\n    \"parkingSpaces\": 300,\n    \"elevators\": 4,\n    \"constructionArea\": 500000,\n    \"landArea\": 50000\n  },\n  \"timeline\": {\n    \"startDate\": \"2023-01-01T00:00:00.000Z\",\n    \"expectedCompletion\": \"2025-12-31T00:00:00.000Z\"\n  },\n  \"progress\": 45,\n  \"isFeatured\": true\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/projects",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"projects"
+							]
+						},
+						"description": "Create a new project (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Project (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Updated Project Title\",\n  \"description\": \"Updated project description\",\n  \"status\": \"completed\",\n  \"progress\": 100\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/projects/{{PROJECT_ID}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"projects",
+								"{{PROJECT_ID}}"
+							]
+						},
+						"description": "Update existing project (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Project (Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/projects/{{PROJECT_ID}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"projects",
+								"{{PROJECT_ID}}"
+							]
+						},
+						"description": "Soft delete project (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Toggle Featured Status (Admin)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/projects/{{PROJECT_ID}}/featured",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"projects",
+								"{{PROJECT_ID}}",
+								"featured"
+							]
+						},
+						"description": "Toggle project featured status (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Project Statistics (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/projects/admin/stats/overview",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"projects",
+								"admin",
+								"stats",
+								"overview"
+							]
+						},
+						"description": "Get project statistics and analytics (Admin only)"
+					},
+					"response": []
+				}
+			],
+			"description": "Project management endpoints for CRUD operations, filtering, and search"
+		},
+		{
+			"name": "Apartments",
+			"item": [
+				{
+					"name": "Get All Apartments",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/apartments?page=1&limit=10&projectId=&type=&bedrooms=&bathrooms=&minPrice=&maxPrice=&available=",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"apartments"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "projectId",
+									"value": ""
+								},
+								{
+									"key": "type",
+									"value": ""
+								},
+								{
+									"key": "bedrooms",
+									"value": ""
+								},
+								{
+									"key": "bathrooms",
+									"value": ""
+								},
+								{
+									"key": "minPrice",
+									"value": ""
+								},
+								{
+									"key": "maxPrice",
+									"value": ""
+								},
+								{
+									"key": "available",
+									"value": ""
+								}
+							]
+						},
+						"description": "Get all apartments with filtering"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Apartments by Project",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/apartments/project/{{PROJECT_ID}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"apartments",
+								"project",
+								"{{PROJECT_ID}}"
+							]
+						},
+						"description": "Get apartments for a specific project"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Apartment (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"projectId\": \"{{PROJECT_ID}}\",\n  \"type\": \"2BHK\",\n  \"name\": \"Premium 2BHK\",\n  \"description\": \"Spacious 2BHK apartment with modern amenities\",\n  \"bedrooms\": 2,\n  \"bathrooms\": 2,\n  \"area\": {\n    \"builtUp\": 1200,\n    \"carpet\": 900,\n    \"balcony\": 100,\n    \"unit\": \"sqft\"\n  },\n  \"price\": {\n    \"base\": 8500000,\n    \"maintenance\": 2500,\n    \"parkingCharges\": 150000\n  },\n  \"features\": [\"Modular Kitchen\", \"Wooden Flooring\", \"Premium Fixtures\"],\n  \"facing\": \"east\",\n  \"floor\": {\n    \"min\": 5,\n    \"max\": 15\n  },\n  \"availability\": {\n    \"totalUnits\": 20,\n    \"availableUnits\": 18\n  }\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/apartments",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"apartments"
+							]
+						},
+						"description": "Create new apartment configuration (Admin only)"
+					},
+					"response": []
+				}
+			],
+			"description": "Apartment management endpoints for configurations and availability"
+		},
+		{
+			"name": "Leads",
+			"item": [
+				{
+					"name": "Create Lead (Public)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"John Doe\",\n  \"mobile\": \"9876543210\",\n  \"email\": \"john@example.com\",\n  \"projectId\": \"{{PROJECT_ID}}\",\n  \"leadType\": \"contact_inquiry\",\n  \"source\": \"website\"\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/leads",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"leads"
+							]
+						},
+						"description": "Create new lead from public forms"
+					},
+					"response": []
+				},
+				{
+					"name": "Download Brochure (Public)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Jane Smith\",\n  \"mobile\": \"9876543210\",\n  \"email\": \"jane@example.com\",\n  \"projectId\": \"{{PROJECT_ID}}\"\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/leads/brochure-download",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"leads",
+								"brochure-download"
+							]
+						},
+						"description": "Download brochure and create lead"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Leads (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/leads?page=1&limit=20&status=&priority=&source=&assignedTo=",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"leads"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "status",
+									"value": ""
+								},
+								{
+									"key": "priority",
+									"value": ""
+								},
+								{
+									"key": "source",
+									"value": ""
+								},
+								{
+									"key": "assignedTo",
+									"value": ""
+								}
+							]
+						},
+						"description": "Get all leads with filtering (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Lead Status (Admin)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"interested\"\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/leads/{{LEAD_ID}}/status",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"leads",
+								"{{LEAD_ID}}",
+								"status"
+							]
+						},
+						"description": "Update lead status (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Add Contact History (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"method\": \"phone\",\n  \"notes\": \"Called customer, interested in 2BHK units\",\n  \"outcome\": \"successful\"\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/leads/{{LEAD_ID}}/contact",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"leads",
+								"{{LEAD_ID}}",
+								"contact"
+							]
+						},
+						"description": "Add contact history to lead (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Lead Statistics (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/leads/stats",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"leads",
+								"stats"
+							]
+						},
+						"description": "Get lead statistics and analytics (Admin only)"
+					},
+					"response": []
+				}
+			],
+			"description": "Lead management endpoints for capturing and managing customer inquiries"
+		},
+		{
+			"name": "Settings",
+			"item": [
+				{
+					"name": "Get Site Settings (Public)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/settings",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"settings"
+							]
+						},
+						"description": "Get public site settings (company info, contact details, etc.)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Admin Settings (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/settings/admin",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"settings",
+								"admin"
+							]
+						},
+						"description": "Get all site settings including sensitive data (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Company Info (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Elite Real Estate\",\n  \"tagline\": \"Your Dream Home Awaits\",\n  \"description\": \"Premium real estate solutions with cutting-edge design and unmatched quality.\"\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/settings/company",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"settings",
+								"company"
+							]
+						},
+						"description": "Update company information (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Contact Info (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"phone\": {\n    \"primary\": \"+91-9999999999\",\n    \"secondary\": \"+91-8888888888\",\n    \"whatsapp\": \"+91-9999999999\"\n  },\n  \"email\": {\n    \"primary\": \"info@eliterealestate.com\",\n    \"sales\": \"sales@eliterealestate.com\",\n    \"support\": \"support@eliterealestate.com\"\n  },\n  \"address\": {\n    \"street\": \"123 Business District\",\n    \"city\": \"Mumbai\",\n    \"state\": \"Maharashtra\",\n    \"zipCode\": \"400001\",\n    \"country\": \"India\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/settings/contact",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"settings",
+								"contact"
+							]
+						},
+						"description": "Update contact information (Admin only)"
+					},
+					"response": []
+				}
+			],
+			"description": "Site settings management for company info, contact details, and configuration"
+		},
+		{
+			"name": "File Upload",
+			"item": [
+				{
+					"name": "Upload Site Images (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "image",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/upload/site-images",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"upload",
+								"site-images"
+							]
+						},
+						"description": "Upload site images like logo, favicon (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Project Images (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "images",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/upload/project-images",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"upload",
+								"project-images"
+							]
+						},
+						"description": "Upload multiple project images (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Floor Plans (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "floorPlan",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/upload/floor-plans",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"upload",
+								"floor-plans"
+							]
+						},
+						"description": "Upload floor plan images (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Brochures (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "brochure",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/upload/brochures",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"upload",
+								"brochures"
+							]
+						},
+						"description": "Upload project brochures (PDF) (Admin only)"
+					},
+					"response": []
+				}
+			],
+			"description": "File upload endpoints for images, documents, and media files"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "BASE_URL",
+			"value": "http://localhost:5000/api",
+			"type": "string"
+		},
+		{
+			"key": "ACCESS_TOKEN",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "REFRESH_TOKEN",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "PROJECT_ID",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "APARTMENT_ID",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "LEAD_ID",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

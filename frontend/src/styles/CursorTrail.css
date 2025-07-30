@@ -1,0 +1,27 @@
+/* Cursor Trail Effect */
+.cursor-trail {
+  position: fixed;
+  width: 20px;
+  height: 20px;
+  background: var(--accent-gradient);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  opacity: 0.6;
+  mix-blend-mode: difference;
+}
+
+.cursor-trail--large {
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: 2px solid var(--accent-primary);
+  opacity: 0.3;
+}
+
+/* Hide cursor trail on touch devices */
+@media (hover: none) and (pointer: coarse) {
+  .cursor-trail {
+    display: none;
+  }
+}
