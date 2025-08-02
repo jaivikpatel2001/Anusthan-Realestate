@@ -233,8 +233,7 @@ const siteSettingsSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Ensure only one settings document exists
-siteSettingsSchema.index({ _id: 1 }, { unique: true });
+// MongoDB automatically creates a unique index on _id
 
 // Static method to get or create settings
 siteSettingsSchema.statics.getSettings = async function() {

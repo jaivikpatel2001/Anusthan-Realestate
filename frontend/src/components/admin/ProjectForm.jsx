@@ -6,7 +6,8 @@ const ProjectForm = ({
   project = null, 
   onSubmit, 
   onCancel, 
-  isLoading = false 
+  isLoading = false,
+  showSubmitButton = true // New prop to control submit button visibility
 }) => {
   const { showError } = useToast();
   
@@ -287,7 +288,7 @@ const ProjectForm = ({
   ];
 
   return (
-    <form onSubmit={handleSubmit} className="project-form">
+    <div className="project-form">
       <div className="form-grid">
         {/* Basic Information */}
         <div className="form-section">
@@ -888,15 +889,17 @@ const ProjectForm = ({
         >
           Cancel
         </button>
-        <button
-          type="submit"
-          className="btn btn-primary"
-          disabled={isLoading}
-        >
-          {isLoading ? 'Saving...' : (project ? 'Update Project' : 'Create Project')}
-        </button>
+        {showSubmitButton && (
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={isLoading}
+          >
+            {isLoading ? 'Saving...' : (project ? 'Update Project' : 'Create Project')}
+          </button>
+        )}
       </div>
-    </form>
+    </div>
   );
 };
 
