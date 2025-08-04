@@ -56,12 +56,7 @@ const FormModal = ({
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (onSubmit && !isLoading) {
-      onSubmit(e);
-    }
-  };
+
 
   const getSizeClasses = () => {
     switch (size) {
@@ -144,54 +139,36 @@ const FormModal = ({
 
             {/* Modal Body */}
             <div className="modal-body">
-              {onSubmit ? (
-                <form onSubmit={handleSubmit} className="modal-form">
-                  {children}
-                  
-                  {showFooter && (
-                    <div className="modal-footer">
-                      <button
-                        type="button"
-                        className="btn btn-secondary"
-                        onClick={onClose}
-                        disabled={isLoading}
-                      >
-                        {cancelText}
-                      </button>
-                      <button
-                        type="submit"
-                        className="btn btn-primary"
-                        disabled={isLoading}
-                      >
-                        {isLoading ? (
-                          <>
-                            <LoadingSpinner size="small" color="white" showText={false} />
-                            Processing...
-                          </>
-                        ) : (
-                          submitText
-                        )}
-                      </button>
-                    </div>
+              {children}
+
+              {showFooter && (
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={onClose}
+                    disabled={isLoading}
+                  >
+                    {cancelText}
+                  </button>
+                  {onSubmit && (
+                    <button
+                      type="submit"
+                      form="modal-form"
+                      className="btn btn-primary"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <>
+                          <LoadingSpinner size="small" color="white" showText={false} />
+                          Processing...
+                        </>
+                      ) : (
+                        submitText
+                      )}
+                    </button>
                   )}
-                </form>
-              ) : (
-                <>
-                  {children}
-                  
-                  {showFooter && (
-                    <div className="modal-footer">
-                      <button
-                        type="button"
-                        className="btn btn-secondary"
-                        onClick={onClose}
-                        disabled={isLoading}
-                      >
-                        {cancelText}
-                      </button>
-                    </div>
-                  )}
-                </>
+                </div>
               )}
             </div>
           </motion.div>

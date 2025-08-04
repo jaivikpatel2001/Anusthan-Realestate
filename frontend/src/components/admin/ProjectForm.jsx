@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { FormField } from './index';
 import { useToast } from '../../hooks/useToast';
+import { selectCurrentToken } from '../../store/slices/authSlice';
 
 const ProjectForm = ({ 
   project = null, 
@@ -9,7 +11,8 @@ const ProjectForm = ({
   isLoading = false,
   showSubmitButton = true // New prop to control submit button visibility
 }) => {
-  const { showError } = useToast();
+  const { showError, showSuccess } = useToast();
+  const token = useSelector(selectCurrentToken);
   
   const [formData, setFormData] = useState({
     title: '',
@@ -68,6 +71,8 @@ const ProjectForm = ({
   const [errors, setErrors] = useState({});
   const [newFeature, setNewFeature] = useState('');
   const [newAmenity, setNewAmenity] = useState('');
+  const [newAmenityIcon, setNewAmenityIcon] = useState('');
+  const [newAmenityDescription, setNewAmenityDescription] = useState('');
   const [newKeyword, setNewKeyword] = useState('');
   const [newApproval, setNewApproval] = useState('');
 
@@ -98,7 +103,7 @@ const ProjectForm = ({
         availableUnits: project.availableUnits || '',
         heroImage: project.heroImage || '',
         features: project.features || [],
-        amenities: project.amenities?.map(a => typeof a === 'object' ? a.name : a) || [],
+        amenities: project.amenities || [],
         specifications: {
           totalFloors: project.specifications?.totalFloors || '',
           parkingSpaces: project.specifications?.parkingSpaces || '',
@@ -202,9 +207,43 @@ const ProjectForm = ({
     return Object.keys(newErrors).length === 0;
   };
 
+  // Helper function to sanitize data and remove any DOM elements or File objects
+  const sanitizeData = (obj) => {
+    if (obj === null || obj === undefined) return obj;
+
+    // Check if it's a DOM element or File object
+    if (obj instanceof Element || obj instanceof File || obj instanceof FileList) {
+      return null;
+    }
+
+    // Handle arrays
+    if (Array.isArray(obj)) {
+      return obj.map(item => sanitizeData(item)).filter(item => item !== null);
+    }
+
+    // Handle objects
+    if (typeof obj === 'object') {
+      const sanitized = {};
+      for (const [key, value] of Object.entries(obj)) {
+        // Skip the _file property which contains the actual File object
+        if (key === '_file') {
+          continue;
+        }
+        const sanitizedValue = sanitizeData(value);
+        if (sanitizedValue !== null) {
+          sanitized[key] = sanitizedValue;
+        }
+      }
+      return sanitized;
+    }
+
+    // Return primitive values as-is
+    return obj;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       showError('Please fix the validation errors');
       return;
@@ -232,7 +271,10 @@ const ProjectForm = ({
       }
     };
 
-    onSubmit(submitData);
+    // Sanitize the data to remove any DOM elements or File objects
+    const sanitizedData = sanitizeData(submitData);
+
+    onSubmit(sanitizedData);
   };
 
   const addArrayItem = (arrayName, value, setter) => {
@@ -275,6 +317,241 @@ const ProjectForm = ({
     }));
   };
 
+  // Amenity handling functions
+  const addAmenity = () => {
+    if (newAmenity.trim()) {
+      const amenityObj = {
+        name: newAmenity.trim(),
+        icon: newAmenityIcon.trim() || undefined,
+        description: newAmenityDescription.trim() || undefined
+      };
+
+      setFormData(prev => ({
+        ...prev,
+        amenities: [...prev.amenities, amenityObj]
+      }));
+
+      // Clear the input fields
+      setNewAmenity('');
+      setNewAmenityIcon('');
+      setNewAmenityDescription('');
+    }
+  };
+
+  const removeAmenity = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      amenities: prev.amenities.filter((_, i) => i !== index)
+    }));
+  };
+
+  // Image upload handling
+  const handleImageUpload = async (name, files) => {
+    if (files && files.length > 0) {
+      const file = files[0];
+
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+      if (!allowedTypes.includes(file.type)) {
+        showError('Please select a valid image file (JPG, PNG, WebP)');
+        return;
+      }
+
+      // Validate file size (10MB max)
+      const maxSize = 10 * 1024 * 1024; // 10MB
+      if (file.size > maxSize) {
+        showError('File size must be less than 10MB');
+        return;
+      }
+
+      // Create FormData for upload
+      const uploadData = new FormData();
+      // Use the actual File object, not the serialized version
+      const actualFile = file._file || file;
+      uploadData.append('images', actualFile);
+
+      try {
+        showSuccess('Uploading image...');
+
+        // Upload to backend
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+        const headers = {
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        };
+
+        const response = await fetch(`${apiUrl}/upload/project-images`, {
+          method: 'POST',
+          headers,
+          body: uploadData,
+          credentials: 'include'
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          if (result.data && result.data.length > 0) {
+            // Update the heroImage field with the uploaded image URL
+            setFormData(prev => ({
+              ...prev,
+              heroImage: result.data[0].url
+            }));
+            showSuccess('Image uploaded successfully!');
+          } else {
+            throw new Error('No image URL returned from server');
+          }
+        } else {
+          throw new Error(result.message || 'Upload failed');
+        }
+      } catch (error) {
+        console.error('Image upload error:', error);
+        showError(error.message || 'Failed to upload image. Please try again.');
+      }
+    }
+  };
+
+  // Multiple images upload handling
+  const handleMultipleImagesUpload = async (name, files) => {
+    if (files && files.length > 0) {
+      const validFiles = [];
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+      const maxSize = 10 * 1024 * 1024; // 10MB
+
+      // Validate all files first
+      for (const file of files) {
+        if (!allowedTypes.includes(file.type)) {
+          showError(`${file.name}: Please select valid image files (JPG, PNG, WebP)`);
+          return;
+        }
+        if (file.size > maxSize) {
+          showError(`${file.name}: File size must be less than 10MB`);
+          return;
+        }
+        validFiles.push(file._file || file);
+      }
+
+      try {
+        showSuccess(`Uploading ${validFiles.length} images...`);
+
+        // Create FormData for upload
+        const uploadData = new FormData();
+        validFiles.forEach(file => {
+          uploadData.append('images', file);
+        });
+
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+        const headers = {
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        };
+
+        const response = await fetch(`${apiUrl}/upload/project-images`, {
+          method: 'POST',
+          headers,
+          body: uploadData,
+          credentials: 'include'
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          if (result.data && result.data.length > 0) {
+            // Add new images to existing images
+            const newImages = result.data.map(img => ({
+              url: img.url,
+              publicId: img.publicId,
+              caption: '',
+              isHero: false
+            }));
+
+            setFormData(prev => ({
+              ...prev,
+              images: [...(prev.images || []), ...newImages]
+            }));
+            showSuccess(`${result.data.length} images uploaded successfully!`);
+          } else {
+            throw new Error('No image URLs returned from server');
+          }
+        } else {
+          throw new Error(result.message || 'Upload failed');
+        }
+      } catch (error) {
+        console.error('Multiple images upload error:', error);
+        showError(error.message || 'Failed to upload images. Please try again.');
+      }
+    }
+  };
+
+  // Brochure upload handling
+  const handleBrochureUpload = async (name, files) => {
+    if (files && files.length > 0) {
+      const file = files[0];
+
+      // Validate file type
+      if (file.type !== 'application/pdf') {
+        showError('Please select a PDF file for the brochure');
+        return;
+      }
+
+      // Validate file size (10MB max)
+      const maxSize = 10 * 1024 * 1024; // 10MB
+      if (file.size > maxSize) {
+        showError('File size must be less than 10MB');
+        return;
+      }
+
+      try {
+        showSuccess('Uploading brochure...');
+
+        // Create FormData for upload
+        const uploadData = new FormData();
+        const actualFile = file._file || file;
+        uploadData.append('brochure', actualFile);
+
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+        const headers = {
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        };
+
+        const response = await fetch(`${apiUrl}/upload/brochures`, {
+          method: 'POST',
+          headers,
+          body: uploadData,
+          credentials: 'include'
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          if (result.data) {
+            setFormData(prev => ({
+              ...prev,
+              brochure: {
+                url: result.data.url,
+                publicId: result.data.publicId,
+                filename: result.data.originalName
+              }
+            }));
+            showSuccess('Brochure uploaded successfully!');
+          } else {
+            throw new Error('No brochure URL returned from server');
+          }
+        } else {
+          throw new Error(result.message || 'Upload failed');
+        }
+      } catch (error) {
+        console.error('Brochure upload error:', error);
+        showError(error.message || 'Failed to upload brochure. Please try again.');
+      }
+    }
+  };
+
+  // Remove project image
+  const removeProjectImage = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index)
+    }));
+  };
+
   const statusOptions = [
     { value: 'upcoming', label: 'Upcoming' },
     { value: 'ongoing', label: 'Ongoing' },
@@ -288,7 +565,7 @@ const ProjectForm = ({
   ];
 
   return (
-    <div className="project-form">
+    <form id="modal-form" onSubmit={handleSubmit} className="project-form">
       <div className="form-grid">
         {/* Basic Information */}
         <div className="form-section">
@@ -361,15 +638,99 @@ const ProjectForm = ({
             />
           </div>
 
-          <FormField
-            label="Hero Image URL"
-            name="heroImage"
-            value={formData.heroImage}
-            onChange={handleInputChange}
-            error={errors.heroImage}
-            required
-            placeholder="https://example.com/image.jpg"
-          />
+          <div className="image-upload-section">
+            <FormField
+              label="Hero Image"
+              name="heroImageFile"
+              type="file"
+              accept="image/jpeg,image/jpg,image/png,image/webp"
+              onChange={handleImageUpload}
+              error={errors.heroImage}
+              required
+              helpText="Upload an image file (JPG, PNG, WebP). Maximum size: 10MB"
+            />
+
+            {formData.heroImage && (
+              <div className="uploaded-image-preview">
+                <img
+                  src={formData.heroImage}
+                  alt="Hero image preview"
+                  className="image-preview"
+                />
+                <p className="image-url">Uploaded: {formData.heroImage}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Multiple Project Images */}
+          <div className="image-upload-section">
+            <FormField
+              label="Project Images"
+              name="projectImages"
+              type="file"
+              accept="image/jpeg,image/jpg,image/png,image/webp"
+              multiple={true}
+              onChange={handleMultipleImagesUpload}
+              helpText="Upload multiple project images (JPG, PNG, WebP). Maximum size: 10MB each"
+            />
+
+            {formData.images && formData.images.length > 0 && (
+              <div className="multiple-images-preview">
+                <h4>Project Images ({formData.images.length})</h4>
+                <div className="images-grid">
+                  {formData.images.map((image, index) => (
+                    <div key={index} className="image-item">
+                      <img
+                        src={image.url}
+                        alt={`Project image ${index + 1}`}
+                        className="image-preview"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeProjectImage(index)}
+                        className="remove-image-btn"
+                        title="Remove image"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Brochure Upload */}
+          <div className="image-upload-section">
+            <FormField
+              label="Project Brochure"
+              name="brochureFile"
+              type="file"
+              accept="application/pdf"
+              onChange={handleBrochureUpload}
+              helpText="Upload project brochure (PDF only). Maximum size: 10MB"
+            />
+
+            {formData.brochure && formData.brochure.url && (
+              <div className="uploaded-file-preview">
+                <div className="file-info">
+                  <span className="file-icon">📄</span>
+                  <div className="file-details">
+                    <p className="file-name">{formData.brochure.filename || 'Project Brochure'}</p>
+                    <p className="file-url">Uploaded: {formData.brochure.url}</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, brochure: null }))}
+                  className="remove-file-btn"
+                  title="Remove brochure"
+                >
+                  ×
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Address Information */}
@@ -564,44 +925,68 @@ const ProjectForm = ({
         <div className="form-section">
           <h3>Amenities</h3>
 
-          <div className="array-input">
-            <div className="array-input-row">
-              <input
-                type="text"
+          <div className="amenity-input">
+            <div className="form-row">
+              <FormField
+                label="Amenity Name"
+                name="amenityName"
                 value={newAmenity}
-                onChange={(e) => setNewAmenity(e.target.value)}
-                placeholder="Add an amenity"
-                className="form-input"
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    addArrayItem('amenities', newAmenity, setNewAmenity);
-                  }
-                }}
+                onChange={(name, value) => setNewAmenity(value)}
+                placeholder="e.g., Swimming Pool"
+                className="flex-1"
               />
-              <button
-                type="button"
-                onClick={() => addArrayItem('amenities', newAmenity, setNewAmenity)}
-                className="btn btn-secondary"
-              >
-                Add
-              </button>
+              <FormField
+                label="Icon (optional)"
+                name="amenityIcon"
+                value={newAmenityIcon}
+                onChange={(name, value) => setNewAmenityIcon(value)}
+                placeholder="e.g., 🏊‍♂️ or icon-class"
+                className="flex-1"
+              />
             </div>
 
-            <div className="array-items">
-              {formData.amenities.map((amenity, index) => (
-                <div key={index} className="array-item">
-                  <span>{amenity}</span>
-                  <button
-                    type="button"
-                    onClick={() => removeArrayItem('amenities', index)}
-                    className="remove-btn"
-                  >
-                    ×
-                  </button>
+            <FormField
+              label="Description (optional)"
+              name="amenityDescription"
+              type="textarea"
+              rows={2}
+              value={newAmenityDescription}
+              onChange={(name, value) => setNewAmenityDescription(value)}
+              placeholder="Brief description of the amenity"
+            />
+
+            <button
+              type="button"
+              onClick={addAmenity}
+              className="btn btn-secondary"
+              disabled={!newAmenity.trim()}
+            >
+              Add Amenity
+            </button>
+          </div>
+
+          <div className="amenity-items">
+            {formData.amenities.map((amenity, index) => (
+              <div key={index} className="amenity-item">
+                <div className="amenity-content">
+                  <div className="amenity-header">
+                    {amenity.icon && <span className="amenity-icon">{amenity.icon}</span>}
+                    <span className="amenity-name">{amenity.name}</span>
+                  </div>
+                  {amenity.description && (
+                    <p className="amenity-description">{amenity.description}</p>
+                  )}
                 </div>
-              ))}
-            </div>
+                <button
+                  type="button"
+                  onClick={() => removeAmenity(index)}
+                  className="remove-btn"
+                  title="Remove amenity"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -899,7 +1284,7 @@ const ProjectForm = ({
           </button>
         )}
       </div>
-    </div>
+    </form>
   );
 };
 

@@ -1,29 +1,44 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { 
-  FiArrowLeft, 
-  FiMapPin, 
-  FiHome, 
-  FiCalendar, 
+import {
+  FiArrowLeft,
+  FiMapPin,
+  FiHome,
+  FiCalendar,
   FiTrendingUp,
   FiDownload,
   FiPhone,
   FiMail,
-  FiShare2
+  FiShare2,
+  FiX,
+  FiChevronLeft,
+  FiChevronRight,
+  FiImage,
+  FiFileText
 } from 'react-icons/fi';
 import { useGetProjectQuery } from '../store/api/projectsApi';
 import { InlineLoading } from '../components/LoadingSpinner';
 import SEOHead from '../components/SEOHead';
+import { useToast } from '../hooks/useToast';
 import '../styles/ProjectDetail.css';
 
 const ProjectDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { showSuccess, showError } = useToast();
+
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [showContactForm, setShowContactForm] = useState(false);
-  
+  const [showImageGallery, setShowImageGallery] = useState(false);
+  const [showBrochureForm, setShowBrochureForm] = useState(false);
+  const [brochureFormData, setBrochureFormData] = useState({
+    name: '',
+    email: '',
+    mobile: ''
+  });
+
   const [ref, inView] = useInView({
     threshold: 0.1,
     triggerOnce: true
@@ -74,8 +89,77 @@ const ProjectDetail = () => {
     } else {
       // Fallback: copy to clipboard
       navigator.clipboard.writeText(window.location.href);
-      // You could show a toast notification here
+      showSuccess('Link copied to clipboard!');
     }
+  };
+
+  // Handle brochure download with lead capture
+  const handleBrochureDownload = () => {
+    setShowBrochureForm(true);
+  };
+
+  const handleBrochureFormSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!brochureFormData.name || !brochureFormData.email || !brochureFormData.mobile) {
+      showError('Please fill in all fields');
+      return;
+    }
+
+    try {
+      // Submit lead data to backend
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/leads/brochure-download`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: brochureFormData.name,
+          email: brochureFormData.email,
+          mobile: brochureFormData.mobile,
+          projectId: project._id
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        // Close form and download brochure
+        setShowBrochureForm(false);
+        setBrochureFormData({ name: '', email: '', mobile: '' });
+
+        // Trigger download using the URL from the response
+        const link = document.createElement('a');
+        link.href = result.data.brochureUrl;
+        link.download = `${result.data.projectTitle}-Brochure.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        showSuccess(result.message || 'Thank you! Your brochure download will start shortly.');
+      } else {
+        throw new Error(result.message || 'Failed to submit form');
+      }
+    } catch (error) {
+      console.error('Brochure form submission error:', error);
+      showError('Failed to submit form. Please try again.');
+    }
+  };
+
+  // Image gallery navigation
+  const nextImage = () => {
+    const allImages = [project.heroImage, ...(project.images || []).map(img => img.url)].filter(Boolean);
+    setSelectedImageIndex((prev) => (prev + 1) % allImages.length);
+  };
+
+  const prevImage = () => {
+    const allImages = [project.heroImage, ...(project.images || []).map(img => img.url)].filter(Boolean);
+    setSelectedImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
+  };
+
+  const openImageGallery = (index = 0) => {
+    setSelectedImageIndex(index);
+    setShowImageGallery(true);
   };
 
   if (isLoading) {
@@ -172,14 +256,13 @@ const ProjectDetail = () => {
                 </button>
                 
                 {project.brochure?.url && (
-                  <a 
-                    href={project.brochure.url}
+                  <button
                     className="contact-btn secondary"
-                    download
+                    onClick={handleBrochureDownload}
                   >
                     <FiDownload size={18} />
-                    Download Brochure
-                  </a>
+                    Get Brochure
+                  </button>
                 )}
                 
                 <button 
@@ -256,6 +339,59 @@ const ProjectDetail = () => {
               </div>
             </div>
 
+            {/* Project Images Gallery */}
+            {project.images && project.images.length > 0 && (
+              <div className="detail-card images-gallery">
+                <div className="gallery-header">
+                  <h3>
+                    <FiImage size={20} />
+                    Project Gallery
+                  </h3>
+                  <button
+                    className="view-all-btn"
+                    onClick={() => openImageGallery(0)}
+                  >
+                    View All ({project.images.length + 1})
+                  </button>
+                </div>
+
+                <div className="images-preview">
+                  <div className="main-image" onClick={() => openImageGallery(0)}>
+                    <img
+                      src={project.heroImage}
+                      alt={`${project.title} - Hero`}
+                      className="preview-image"
+                    />
+                    <div className="image-overlay">
+                      <FiImage size={24} />
+                      <span>View Gallery</span>
+                    </div>
+                  </div>
+
+                  <div className="thumbnail-grid">
+                    {project.images.slice(0, 4).map((image, index) => (
+                      <div
+                        key={index}
+                        className="thumbnail-item"
+                        onClick={() => openImageGallery(index + 1)}
+                      >
+                        <img
+                          src={image.url}
+                          alt={`${project.title} - Image ${index + 1}`}
+                          className="thumbnail-image"
+                        />
+                        {index === 3 && project.images.length > 4 && (
+                          <div className="more-images-overlay">
+                            +{project.images.length - 3}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Amenities */}
             {project.amenities && project.amenities.length > 0 && (
               <div className="detail-card">
@@ -294,6 +430,136 @@ const ProjectDetail = () => {
           </motion.div>
         </div>
       </section>
+
+      {/* Image Gallery Modal */}
+      <AnimatePresence>
+        {showImageGallery && (
+          <motion.div
+            className="image-gallery-modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowImageGallery(false)}
+          >
+            <div className="gallery-content" onClick={(e) => e.stopPropagation()}>
+              <button
+                className="close-gallery"
+                onClick={() => setShowImageGallery(false)}
+              >
+                <FiX size={24} />
+              </button>
+
+              <button className="gallery-nav prev" onClick={prevImage}>
+                <FiChevronLeft size={24} />
+              </button>
+
+              <button className="gallery-nav next" onClick={nextImage}>
+                <FiChevronRight size={24} />
+              </button>
+
+              <div className="gallery-image-container">
+                <img
+                  src={[project.heroImage, ...(project.images || []).map(img => img.url)].filter(Boolean)[selectedImageIndex]}
+                  alt={`${project.title} - Image ${selectedImageIndex + 1}`}
+                  className="gallery-image"
+                />
+              </div>
+
+              <div className="gallery-thumbnails">
+                {[project.heroImage, ...(project.images || []).map(img => img.url)].filter(Boolean).map((image, index) => (
+                  <img
+                    key={index}
+                    src={image}
+                    alt={`Thumbnail ${index + 1}`}
+                    className={`gallery-thumbnail ${index === selectedImageIndex ? 'active' : ''}`}
+                    onClick={() => setSelectedImageIndex(index)}
+                  />
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Brochure Download Form Modal */}
+      <AnimatePresence>
+        {showBrochureForm && (
+          <motion.div
+            className="brochure-form-modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowBrochureForm(false)}
+          >
+            <motion.div
+              className="brochure-form-content"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="form-header">
+                <h3>Get Project Brochure</h3>
+                <p>Please provide your details to download the brochure</p>
+                <button
+                  className="close-form"
+                  onClick={() => setShowBrochureForm(false)}
+                >
+                  <FiX size={20} />
+                </button>
+              </div>
+
+              <form onSubmit={handleBrochureFormSubmit} className="brochure-form">
+                <div className="form-group">
+                  <label htmlFor="name">Full Name *</label>
+                  <input
+                    type="text"
+                    id="name"
+                    value={brochureFormData.name}
+                    onChange={(e) => setBrochureFormData(prev => ({ ...prev, name: e.target.value }))}
+                    placeholder="Enter your full name"
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="email">Email Address *</label>
+                  <input
+                    type="email"
+                    id="email"
+                    value={brochureFormData.email}
+                    onChange={(e) => setBrochureFormData(prev => ({ ...prev, email: e.target.value }))}
+                    placeholder="Enter your email address"
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="mobile">Mobile Number *</label>
+                  <input
+                    type="tel"
+                    id="mobile"
+                    value={brochureFormData.mobile}
+                    onChange={(e) => setBrochureFormData(prev => ({ ...prev, mobile: e.target.value }))}
+                    placeholder="Enter your mobile number"
+                    required
+                  />
+                </div>
+
+                <div className="form-actions">
+                  <button type="button" className="btn-cancel" onClick={() => setShowBrochureForm(false)}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn-download">
+                    <FiDownload size={18} />
+                    Download Brochure
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 };

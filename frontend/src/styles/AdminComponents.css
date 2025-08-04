@@ -1019,6 +1019,253 @@
   background: rgba(255, 255, 255, 0.2);
 }
 
+/* Amenity Items */
+.amenity-input {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.amenity-items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.amenity-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: var(--space-3);
+  background: var(--glass-bg);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  transition: var(--transition-fast);
+}
+
+.amenity-item:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--border-secondary);
+}
+
+.amenity-content {
+  flex: 1;
+}
+
+.amenity-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
+}
+
+.amenity-icon {
+  font-size: 1.2em;
+  min-width: 24px;
+}
+
+.amenity-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.amenity-description {
+  color: var(--text-secondary);
+  font-size: 0.9em;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Image Upload Section */
+.image-upload-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.uploaded-image-preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--glass-bg);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+}
+
+.image-preview {
+  max-width: 200px;
+  max-height: 150px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-primary);
+}
+
+.image-url {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin: 0;
+  word-break: break-all;
+}
+
+/* File Upload Area Improvements */
+.file-upload-area {
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.file-upload-area:hover {
+  border-color: var(--accent-primary);
+  background: var(--glass-bg-hover);
+}
+
+.file-upload-area.drag-over {
+  border-color: var(--accent-primary);
+  background: var(--accent-primary-light);
+  transform: scale(1.02);
+}
+
+.file-upload-content {
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-secondary);
+}
+
+.file-upload-content p {
+  margin: 0;
+  font-weight: 500;
+}
+
+.file-upload-content small {
+  color: var(--text-tertiary);
+}
+
+/* Multiple Images Preview */
+.multiple-images-preview {
+  margin-top: var(--space-4);
+}
+
+.multiple-images-preview h4 {
+  margin: 0 0 var(--space-3) 0;
+  color: var(--text-primary);
+  font-size: var(--text-lg);
+}
+
+.images-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--space-3);
+}
+
+.image-item {
+  position: relative;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border-primary);
+  background: var(--glass-bg);
+}
+
+.image-item .image-preview {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  display: block;
+}
+
+.remove-image-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--danger);
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: var(--transition-fast);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.remove-image-btn:hover {
+  background: var(--danger);
+  color: white;
+  transform: scale(1.1);
+}
+
+/* File Preview (for brochures) */
+.uploaded-file-preview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3);
+  background: var(--glass-bg);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  margin-top: var(--space-3);
+}
+
+.file-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex: 1;
+}
+
+.file-icon {
+  font-size: 2em;
+  min-width: 40px;
+}
+
+.file-details {
+  flex: 1;
+}
+
+.file-name {
+  margin: 0 0 var(--space-1) 0;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.file-url {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  word-break: break-all;
+}
+
+.remove-file-btn {
+  background: var(--danger);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  transition: var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.remove-file-btn:hover {
+  background: var(--danger-dark);
+  transform: scale(1.1);
+}
+
 /* Table Cell Styles */
 .project-info strong {
   display: block;

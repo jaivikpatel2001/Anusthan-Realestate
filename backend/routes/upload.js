@@ -130,6 +130,45 @@ router.post('/project-images', protect, adminOnly, uploadConfigs.projectImages.a
   }
 });
 
+// Upload brochures
+router.post('/brochures', protect, adminOnly, uploadConfigs.brochures.single('brochure'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No file uploaded'
+      });
+    }
+
+    // Validate file type
+    if (req.file.mimetype !== 'application/pdf') {
+      return res.status(400).json({
+        success: false,
+        message: 'Only PDF files are allowed for brochures'
+      });
+    }
+
+    const result = await handleFileUpload(req, req.file, 'realstate/brochures');
+
+    res.json({
+      success: true,
+      message: 'Brochure uploaded successfully',
+      data: {
+        url: result.url,
+        publicId: result.publicId,
+        originalName: req.file.originalname
+      }
+    });
+  } catch (error) {
+    console.error('Brochure upload error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to upload brochure',
+      error: error.message
+    });
+  }
+});
+
 // Upload floor plans
 router.post('/floor-plans', protect, adminOnly, uploadConfigs.floorPlans.single('floorPlan'), async (req, res) => {
   try {

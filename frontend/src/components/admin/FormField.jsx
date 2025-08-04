@@ -25,9 +25,18 @@ const FormField = ({
 
   const handleInputChange = (e) => {
     const { value: inputValue, files, type: inputType } = e.target;
-    
+
     if (inputType === 'file') {
-      onChange(name, files);
+      // Convert FileList to Array and extract only serializable properties
+      const fileArray = files ? Array.from(files).map(file => ({
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        lastModified: file.lastModified,
+        // Store the actual File object separately if needed for upload
+        _file: file
+      })) : [];
+      onChange(name, fileArray);
     } else if (inputType === 'checkbox') {
       onChange(name, e.target.checked);
     } else if (multiple && inputType === 'select-multiple') {
@@ -53,7 +62,16 @@ const FormField = ({
     setDragOver(false);
     const files = e.dataTransfer.files;
     if (files.length > 0) {
-      onChange(name, files);
+      // Convert FileList to Array and extract only serializable properties
+      const fileArray = Array.from(files).map(file => ({
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        lastModified: file.lastModified,
+        // Store the actual File object separately if needed for upload
+        _file: file
+      }));
+      onChange(name, fileArray);
     }
   };
 
@@ -124,8 +142,10 @@ const FormField = ({
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
+            onClick={() => document.getElementById(`file-input-${name}`)?.click()}
           >
             <input
+              id={`file-input-${name}`}
               type="file"
               name={name}
               onChange={handleInputChange}
@@ -135,12 +155,13 @@ const FormField = ({
               accept={accept}
               multiple={multiple}
               className="file-input"
+              style={{ display: 'none' }}
               {...props}
             />
             <div className="file-upload-content">
               <FiUpload size={24} />
               <p>
-                {multiple ? 'Drop files here or click to select' : 'Drop file here or click to select'}
+                {multiple ? 'Click to select files or drag and drop' : 'Click to select file or drag and drop'}
               </p>
               {accept && <small>Accepted formats: {accept}</small>}
             </div>
