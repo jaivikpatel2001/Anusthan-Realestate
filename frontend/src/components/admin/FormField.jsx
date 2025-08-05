@@ -18,6 +18,7 @@ const FormField = ({
   accept, // For file input
   className = '',
   helpText,
+  children, // For custom select options
   ...props
 }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -36,14 +37,24 @@ const FormField = ({
         // Store the actual File object separately if needed for upload
         _file: file
       })) : [];
-      onChange(name, fileArray);
+      // Call onChange with name and value for consistency
+      if (onChange) {
+        onChange(name, fileArray);
+      }
     } else if (inputType === 'checkbox') {
-      onChange(name, e.target.checked);
+      if (onChange) {
+        onChange(name, e.target.checked);
+      }
     } else if (multiple && inputType === 'select-multiple') {
       const selectedValues = Array.from(e.target.selectedOptions, option => option.value);
-      onChange(name, selectedValues);
+      if (onChange) {
+        onChange(name, selectedValues);
+      }
     } else {
-      onChange(name, inputValue);
+      // Handle regular inputs (text, select, textarea, etc.)
+      if (onChange) {
+        onChange(name, inputValue);
+      }
     }
   };
 
@@ -71,7 +82,9 @@ const FormField = ({
         // Store the actual File object separately if needed for upload
         _file: file
       }));
-      onChange(name, fileArray);
+      if (onChange) {
+        onChange(name, fileArray);
+      }
     }
   };
 
@@ -108,8 +121,8 @@ const FormField = ({
             className={baseClasses}
             {...props}
           >
-            {!multiple && <option value="">Select {label}</option>}
-            {options.map((option) => (
+            {!multiple && !children && <option value="">Select {label}</option>}
+            {children || options.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
@@ -181,7 +194,9 @@ const FormField = ({
                         onClick={(e) => {
                           e.stopPropagation();
                           const newFiles = value.filter((_, i) => i !== index);
-                          onChange(name, newFiles);
+                          if (onChange) {
+                            onChange(name, newFiles);
+                          }
                         }}
                         className="remove-file-btn"
                         title="Remove file"
@@ -197,7 +212,9 @@ const FormField = ({
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        onChange(name, []);
+                        if (onChange) {
+                          onChange(name, []);
+                        }
                       }}
                       className="clear-all-btn"
                     >

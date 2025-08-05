@@ -22,7 +22,7 @@ const FormModal = ({
   // Handle escape key
   useEffect(() => {
     const handleEscape = (e) => {
-      if (e.key === 'Escape' && isOpen) {
+      if (e.key === 'Escape' && isOpen && !isLoading) {
         onClose();
       }
     };
@@ -34,7 +34,7 @@ const FormModal = ({
       // Focus first input
       setTimeout(() => {
         const firstInput = modalRef.current?.querySelector('input, textarea, select');
-        if (firstInput) {
+        if (firstInput && !firstInput.disabled) {
           firstInput.focus();
         }
       }, 100);
@@ -46,29 +46,37 @@ const FormModal = ({
       document.removeEventListener('keydown', handleEscape);
       document.body.style.overflow = 'unset';
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, isLoading]);
 
   // Handle backdrop click
   const handleBackdropClick = (e) => {
-    if (e.target === e.currentTarget) {
+    if (e.target === e.currentTarget && !isLoading) {
       onClose();
     }
   };
 
   // Handle form submission
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
-    if (onSubmit) {
-      // Find the form inside the modal and trigger its submit event
+  const handleFormSubmit = async (e) => {
+    e?.preventDefault();
+    
+    if (!onSubmit || isLoading) return;
+
+    try {
+      // Find the form inside the modal
       const form = modalRef.current?.querySelector('#modal-form');
       if (form) {
-        // Create and dispatch a submit event
+        // Trigger the form's submit event which will call the form's onSubmit handler
         const submitEvent = new Event('submit', { 
           bubbles: true, 
           cancelable: true 
         });
         form.dispatchEvent(submitEvent);
+      } else {
+        // If no form found, call onSubmit directly
+        await onSubmit();
       }
+    } catch (error) {
+      console.error('Modal form submission error:', error);
     }
   };
 

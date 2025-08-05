@@ -19,6 +19,8 @@ const MilestoneForm = ({
     sortOrder: 0
   });
 
+  const [errors, setErrors] = useState({});
+
   // Initialize form with existing data
   useEffect(() => {
     if (initialData) {
@@ -33,24 +35,58 @@ const MilestoneForm = ({
     }
   }, [initialData]);
 
-  // Handle input changes
-  const handleInputChange = (e) => {
-    // Handle both event objects and direct values from FormField
-    const target = e?.target || e;
-    const name = target?.name || (typeof e === 'string' ? arguments[0] : '');
-    const value = target?.value || (typeof e === 'string' ? arguments[1] : target?.value || '');
-    const type = target?.type || 'text';
-    const checked = target?.checked || false;
+  // Handle input changes - consistent signature for all field types
+  const handleInputChange = (name, value) => {
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: value
     }));
+
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+  };
+
+  // Validate form
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.year) {
+      newErrors.year = 'Year is required';
+    }
+
+    if (!formData.heading.trim()) {
+      newErrors.heading = 'Heading is required';
+    } else if (formData.heading.length > 100) {
+      newErrors.heading = 'Heading must be less than 100 characters';
+    }
+
+    if (!formData.description.trim()) {
+      newErrors.description = 'Description is required';
+    } else if (formData.description.length > 500) {
+      newErrors.description = 'Description must be less than 500 characters';
+    }
+
+    if (formData.sortOrder < 0 || formData.sortOrder > 999) {
+      newErrors.sortOrder = 'Sort order must be between 0 and 999';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    if (!validateForm()) {
+      return;
+    }
+
     try {
       await onSubmit(formData);
     } catch (error) {
@@ -62,7 +98,10 @@ const MilestoneForm = ({
   const currentYear = new Date().getFullYear();
   const yearOptions = [];
   for (let year = currentYear + 5; year >= 1990; year--) {
-    yearOptions.push(year);
+    yearOptions.push({
+      value: year.toString(),
+      label: year.toString()
+    });
   }
 
   // Common icon options for milestones
@@ -81,7 +120,7 @@ const MilestoneForm = ({
   ];
 
   return (
-    <form onSubmit={handleSubmit} className="milestone-form">
+    <form id="modal-form" onSubmit={handleSubmit} className="milestone-form">
       <div className="form-grid">
         {/* Basic Information */}
         <div className="form-section">
@@ -94,16 +133,10 @@ const MilestoneForm = ({
               type="select"
               value={formData.year}
               onChange={handleInputChange}
+              error={errors.year}
               required
-              icon={<FiCalendar />}
-            >
-              <option value="">Select Year</option>
-              {yearOptions.map(year => (
-                <option key={year} value={year.toString()}>
-                  {year}
-                </option>
-              ))}
-            </FormField>
+              options={yearOptions}
+            />
 
             <FormField
               label="Sort Order"
@@ -111,6 +144,7 @@ const MilestoneForm = ({
               type="number"
               value={formData.sortOrder}
               onChange={handleInputChange}
+              error={errors.sortOrder}
               placeholder="Display order (0 = first)"
               min="0"
               max="999"
@@ -122,10 +156,10 @@ const MilestoneForm = ({
             name="heading"
             value={formData.heading}
             onChange={handleInputChange}
+            error={errors.heading}
             required
             placeholder="e.g., Company Founded, First Major Project"
-            maxLength={100}
-            icon={<FiType />}
+            maxLength="100"
           />
 
           <FormField
@@ -134,11 +168,11 @@ const MilestoneForm = ({
             type="textarea"
             value={formData.description}
             onChange={handleInputChange}
+            error={errors.description}
             required
             placeholder="Describe this milestone and its significance..."
             rows={4}
-            maxLength={500}
-            icon={<FiFileText />}
+            maxLength="500"
           />
 
           <FormField
@@ -147,32 +181,22 @@ const MilestoneForm = ({
             type="select"
             value={formData.icon}
             onChange={handleInputChange}
-            placeholder="Choose an icon (optional)"
-          >
-            {iconOptions.map(option => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </FormField>
+            error={errors.icon}
+            options={iconOptions}
+          />
         </div>
 
         {/* Settings */}
         <div className="form-section">
           <h3>Settings</h3>
           
-          <div className="checkbox-field">
-            <label className="checkbox-label">
-              <input
-                type="checkbox"
-                name="isActive"
-                checked={formData.isActive}
-                onChange={handleInputChange}
-              />
-              <span className="checkmark"></span>
-              Active (visible on website)
-            </label>
-          </div>
+          <FormField
+            label="Active (visible on website)"
+            name="isActive"
+            type="checkbox"
+            value={formData.isActive}
+            onChange={handleInputChange}
+          />
 
           {/* Preview */}
           <div className="milestone-preview">
