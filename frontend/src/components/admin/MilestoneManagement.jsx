@@ -151,7 +151,7 @@ const MilestoneManagement = () => {
     {
       icon: <FiEdit className="action-icon" />,
       title: 'Edit',
-      className: 'edit-action',
+      className: 'edit',
       onClick: (milestone) => {
         setSelectedMilestone(milestone);
         setShowEditModal(true);
@@ -160,7 +160,7 @@ const MilestoneManagement = () => {
     {
       icon: <FiTrash2 className="action-icon" />,
       title: 'Delete',
-      className: 'delete-action',
+      className: 'delete',
       onClick: (milestone) => {
         setSelectedMilestone(milestone);
         setShowDeleteDialog(true);
@@ -229,6 +229,7 @@ return (
       <div className="search-box">
         <FiSearch className="search-icon" />
         <input
+          className='search-input'
           type="text"
           placeholder="Search milestones..."
           value={searchTerm}

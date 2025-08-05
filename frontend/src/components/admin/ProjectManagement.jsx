@@ -130,7 +130,7 @@ const ProjectManagement = () => {
       key: 'status',
       title: 'Status',
       render: (value) => (
-        <span className={`status-badge ${value}`}>
+        <span className={`status-badgefortable ${value}`}>
           {value.charAt(0).toUpperCase() + value.slice(1)}
         </span>
       )

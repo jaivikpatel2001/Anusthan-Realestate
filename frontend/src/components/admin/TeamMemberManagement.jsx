@@ -145,9 +145,9 @@ const TeamMemberManagement = () => {
 
   // Table actions
   const actions = [
-    {
+    { className:'edit',
       label: 'Edit',
-      icon: FiEdit,
+      icon: <FiEdit/>,
       onClick: (member) => {
         setSelectedMember(member);
         setShowEditModal(true);
@@ -159,14 +159,14 @@ const TeamMemberManagement = () => {
       onClick: handleToggleActive,
       loading: toggleLoading
     },
-    {
+    { className:'delete',
       label: 'Delete',
-      icon: FiTrash2,
+      icon: <FiTrash2/>,
       onClick: (member) => {
         setSelectedMember(member);
         setShowDeleteDialog(true);
       },
-      className: 'danger'
+      
     }
   ];
 
@@ -222,6 +222,7 @@ const TeamMemberManagement = () => {
         <div className="search-box">
           <FiSearch className="search-icon" />
           <input
+            className='search-input'
             type="text"
             placeholder="Search team members..."
             value={searchTerm}
