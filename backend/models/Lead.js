@@ -76,7 +76,7 @@ const leadSchema = new mongoose.Schema({
     },
     method: {
       type: String,
-      enum: ['phone', 'email', 'sms', 'whatsapp', 'meeting', 'site_visit'],
+      enum: ['phone', 'email', 'sms', 'whatsapp', 'meeting', 'site_visit', 'website'],
       required: true
     },
     notes: String,

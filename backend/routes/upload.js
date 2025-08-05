@@ -96,15 +96,24 @@ router.post('/site-images', protect, adminOnly, uploadConfigs.siteImages.single(
 // Upload project images
 router.post('/project-images', protect, adminOnly, uploadConfigs.projectImages.array('images', 10), async (req, res) => {
   try {
+    console.log('Project images upload request received');
+    console.log('Files received:', req.files?.length || 0);
+    console.log('Request body:', req.body);
+
     if (!req.files || req.files.length === 0) {
+      console.log('No files in request');
       return res.status(400).json({
         success: false,
         message: 'No files uploaded'
       });
     }
 
+    console.log('Processing files:', req.files.map(f => ({ name: f.originalname, size: f.size, type: f.mimetype })));
+
     const uploadPromises = req.files.map(file => handleFileUpload(req, file, 'realstate/projects'));
     const results = await Promise.all(uploadPromises);
+
+    console.log('Upload results:', results.map(r => ({ url: r.url, success: r.success })));
 
     const uploadedFiles = results.map((result, index) => ({
       url: result.url,
@@ -114,6 +123,8 @@ router.post('/project-images', protect, adminOnly, uploadConfigs.projectImages.a
       size: req.files[index].size,
       mimetype: req.files[index].mimetype
     }));
+
+    console.log('Sending response with uploaded files:', uploadedFiles.length);
 
     res.json({
       success: true,
@@ -198,6 +209,40 @@ router.post('/floor-plans', protect, adminOnly, uploadConfigs.floorPlans.single(
     res.status(500).json({
       success: false,
       message: 'Failed to upload floor plan',
+      error: error.message
+    });
+  }
+});
+
+// Upload team member images
+router.post('/team-images', protect, adminOnly, uploadConfigs.siteImages.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No file uploaded'
+      });
+    }
+
+    const result = await handleFileUpload(req, req.file, 'realstate/team');
+
+    res.json({
+      success: true,
+      message: 'Team member image uploaded successfully',
+      data: {
+        url: result.url,
+        publicId: result.publicId,
+        filename: req.file.filename,
+        originalName: req.file.originalname,
+        size: req.file.size,
+        mimetype: req.file.mimetype
+      }
+    });
+  } catch (error) {
+    console.error('Team member image upload error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to upload team member image',
       error: error.message
     });
   }

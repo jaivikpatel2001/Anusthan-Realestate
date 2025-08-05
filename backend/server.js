@@ -78,6 +78,10 @@ app.use('/api/apartments', require('./routes/apartments'));
 app.use('/api/leads', require('./routes/leads'));
 app.use('/api/settings', require('./routes/settings'));
 app.use('/api/upload', require('./routes/upload'));
+app.use('/api/team-members', require('./routes/teamMembers'));
+app.use('/api/milestones', require('./routes/milestones'));
+app.use('/api/statistics', require('./routes/statistics'));
+app.use('/api/addresses', require('./routes/addresses'));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

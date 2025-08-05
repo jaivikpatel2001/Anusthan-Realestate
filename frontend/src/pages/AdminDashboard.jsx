@@ -9,6 +9,9 @@ import {
   FiSettings,
   FiLogOut
 } from 'react-icons/fi';
+import { RiTeamFill } from 'react-icons/ri';
+import { MdTimeline } from 'react-icons/md';
+import { FiBarChart } from 'react-icons/fi';
 import { selectIsAuthenticated, selectIsAdmin, selectCurrentUser } from '../store/slices/authSlice';
 import { logout } from '../store/slices/authSlice';
 import { useLogoutMutation } from '../store/api/authApi';
@@ -23,6 +26,9 @@ import ApartmentManagement from '../components/admin/ApartmentManagement';
 import LeadManagement from '../components/admin/LeadManagement';
 import UserManagement from '../components/admin/UserManagement';
 import SettingsManagement from '../components/admin/SettingsManagement';
+import TeamMemberManagement from '../components/admin/TeamMemberManagement';
+import MilestoneManagement from '../components/admin/MilestoneManagement';
+import StatisticsManagement from '../components/admin/StatisticsManagement';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -64,6 +70,9 @@ const AdminDashboard = () => {
     { id: 'projects', label: 'Projects', icon: FiFolder },
     { id: 'apartments', label: 'Apartments', icon: BiBuilding },
     { id: 'leads', label: 'Leads', icon: FiUsers },
+    { id: 'team', label: 'Team Members', icon: RiTeamFill },
+    { id: 'milestones', label: 'Company Journey', icon: MdTimeline },
+    { id: 'statistics', label: 'Site Statistics', icon: FiBarChart },
     { id: 'settings', label: 'Settings', icon: FiSettings },
   ];
 
@@ -206,6 +215,39 @@ const AdminDashboard = () => {
               animate="visible"
             >
               <LeadManagement />
+            </motion.div>
+          )}
+
+          {activeTab === 'team' && (
+            <motion.div
+              className="team-section"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              <TeamMemberManagement />
+            </motion.div>
+          )}
+
+          {activeTab === 'milestones' && (
+            <motion.div
+              className="milestones-section"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              <MilestoneManagement />
+            </motion.div>
+          )}
+
+          {activeTab === 'statistics' && (
+            <motion.div
+              className="statistics-section"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              <StatisticsManagement />
             </motion.div>
           )}
 

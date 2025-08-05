@@ -5,10 +5,13 @@ import { FaTimes, FaDownload, FaSpinner } from 'react-icons/fa';
 import { selectModal, closeModal } from '../store/slices/uiSlice';
 import { useDownloadBrochureMutation } from '../store/api/leadsApi';
 import { useToast } from '../hooks/useToast';
+import { downloadPDF } from '../utils/pdfDownload';
 
 const BrochureDownloadModal = () => {
   const dispatch = useDispatch();
   const { showSuccess, showError } = useToast();
+
+
   const modal = useSelector(selectModal('brochureDownload'));
   
   const [formData, setFormData] = useState({
@@ -67,12 +70,7 @@ const BrochureDownloadModal = () => {
       
       // Trigger download
       if (response.brochureUrl) {
-        const link = document.createElement('a');
-        link.href = response.brochureUrl;
-        link.download = `${response.projectTitle}-Brochure.pdf`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        await downloadPDF(response.brochureUrl, `${response.projectTitle}-Brochure.pdf`, showError);
       }
 
       handleClose();

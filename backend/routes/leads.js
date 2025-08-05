@@ -152,7 +152,9 @@ router.post('/brochure-download', validateLead.create, async (req, res) => {
       data: {
         brochureUrl: project.brochure.url,
         projectTitle: project.title,
-        leadId: lead._id
+        leadId: lead._id,
+        brochureSize: project.brochure.size || null,
+        brochureFilename: project.brochure.filename || `${project.title}-Brochure.pdf`
       }
     });
   } catch (error) {
@@ -160,6 +162,62 @@ router.post('/brochure-download', validateLead.create, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to process brochure download',
+      error: error.message
+    });
+  }
+});
+
+// @desc    Serve PDF with proper headers
+// @route   GET /api/leads/serve-pdf/:projectId
+// @access  Public
+router.get('/serve-pdf/:projectId', async (req, res) => {
+  try {
+    const { projectId } = req.params;
+
+    // Verify project exists and has brochure
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({
+        success: false,
+        message: 'Project not found'
+      });
+    }
+
+    if (!project.brochure || !project.brochure.url) {
+      return res.status(404).json({
+        success: false,
+        message: 'Brochure not available for this project'
+      });
+    }
+
+    // Set proper headers for PDF
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${project.title}-Brochure.pdf"`);
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+
+    // If it's a Cloudinary URL, redirect with proper headers
+    if (project.brochure.url.includes('cloudinary.com')) {
+      return res.redirect(project.brochure.url);
+    }
+
+    // For local files, serve directly
+    const path = require('path');
+    const fs = require('fs');
+
+    if (project.brochure.localPath && fs.existsSync(project.brochure.localPath)) {
+      return res.sendFile(path.resolve(project.brochure.localPath));
+    }
+
+    // Fallback to URL redirect
+    res.redirect(project.brochure.url);
+
+  } catch (error) {
+    console.error('PDF serve error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while serving PDF',
       error: error.message
     });
   }

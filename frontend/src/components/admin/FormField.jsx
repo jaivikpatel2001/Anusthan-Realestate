@@ -137,34 +137,76 @@ const FormField = ({
 
       case 'file':
         return (
-          <div
-            className={`file-upload-area ${dragOver ? 'drag-over' : ''} ${baseClasses}`}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            onClick={() => document.getElementById(`file-input-${name}`)?.click()}
-          >
-            <input
-              id={`file-input-${name}`}
-              type="file"
-              name={name}
-              onChange={handleInputChange}
-              onBlur={onBlur}
-              required={required}
-              disabled={disabled}
-              accept={accept}
-              multiple={multiple}
-              className="file-input"
-              style={{ display: 'none' }}
-              {...props}
-            />
-            <div className="file-upload-content">
-              <FiUpload size={24} />
-              <p>
-                {multiple ? 'Click to select files or drag and drop' : 'Click to select file or drag and drop'}
-              </p>
-              {accept && <small>Accepted formats: {accept}</small>}
+          <div className="file-field-container">
+            <div
+              className={`file-upload-area ${dragOver ? 'drag-over' : ''} ${baseClasses}`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              onClick={() => document.getElementById(`file-input-${name}`)?.click()}
+            >
+              <input
+                id={`file-input-${name}`}
+                type="file"
+                name={name}
+                onChange={handleInputChange}
+                onBlur={onBlur}
+                required={required}
+                disabled={disabled}
+                accept={accept}
+                multiple={multiple}
+                className="file-input"
+                style={{ display: 'none' }}
+                {...props}
+              />
+              <div className="file-upload-content">
+                <FiUpload size={24} />
+                <p>
+                  {multiple ? 'Click to select files or drag and drop' : 'Click to select file or drag and drop'}
+                </p>
+                {accept && <small>Accepted formats: {accept}</small>}
+                {multiple && <small>You can select multiple files at once</small>}
+              </div>
             </div>
+            {value && value.length > 0 && (
+              <div className="selected-files">
+                <h4>Selected Files ({value.length}):</h4>
+                <ul className="file-list">
+                  {value.map((file, index) => (
+                    <li key={index} className="selected-file">
+                      <span className="file-name">{file.name}</span>
+                      <span className="file-size">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const newFiles = value.filter((_, i) => i !== index);
+                          onChange(name, newFiles);
+                        }}
+                        className="remove-file-btn"
+                        title="Remove file"
+                      >
+                        <FiX size={16} />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+                {multiple && (
+                  <div className="file-actions">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onChange(name, []);
+                      }}
+                      className="clear-all-btn"
+                    >
+                      Clear All
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         );
 

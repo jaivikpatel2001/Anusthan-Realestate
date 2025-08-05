@@ -22,12 +22,15 @@ import { useGetProjectQuery } from '../store/api/projectsApi';
 import { InlineLoading } from '../components/LoadingSpinner';
 import SEOHead from '../components/SEOHead';
 import { useToast } from '../hooks/useToast';
+import { downloadPDF } from '../utils/pdfDownload';
 import '../styles/ProjectDetail.css';
 
 const ProjectDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { showSuccess, showError } = useToast();
+
+
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [showContactForm, setShowContactForm] = useState(false);
@@ -129,12 +132,7 @@ const ProjectDetail = () => {
         setBrochureFormData({ name: '', email: '', mobile: '' });
 
         // Trigger download using the URL from the response
-        const link = document.createElement('a');
-        link.href = result.data.brochureUrl;
-        link.download = `${result.data.projectTitle}-Brochure.pdf`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        await downloadPDF(result.data.brochureUrl, `${result.data.projectTitle}-Brochure.pdf`, showError);
 
         showSuccess(result.message || 'Thank you! Your brochure download will start shortly.');
       } else {

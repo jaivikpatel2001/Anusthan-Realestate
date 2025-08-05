@@ -411,72 +411,105 @@ const ProjectForm = ({
 
   // Multiple images upload handling
   const handleMultipleImagesUpload = async (name, files) => {
-    if (files && files.length > 0) {
-      const validFiles = [];
-      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-      const maxSize = 10 * 1024 * 1024; // 10MB
+    console.log('Multiple images upload triggered:', { name, files, filesLength: files?.length });
 
-      // Validate all files first
-      for (const file of files) {
-        if (!allowedTypes.includes(file.type)) {
-          showError(`${file.name}: Please select valid image files (JPG, PNG, WebP)`);
-          return;
-        }
-        if (file.size > maxSize) {
-          showError(`${file.name}: File size must be less than 10MB`);
-          return;
-        }
-        validFiles.push(file._file || file);
+    if (!files || files.length === 0) {
+      console.log('No files selected');
+      return;
+    }
+
+    const validFiles = [];
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const maxSize = 10 * 1024 * 1024; // 10MB
+
+    // Validate all files first
+    for (let i = 0; i < files.length; i++) {
+      const fileObj = files[i];
+      const file = fileObj._file || fileObj; // Handle both File objects and our custom objects
+
+      console.log(`Validating file ${i + 1}:`, {
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        isFile: file instanceof File
+      });
+
+      if (!allowedTypes.includes(file.type)) {
+        showError(`${file.name}: Please select valid image files (JPG, PNG, WebP)`);
+        return;
+      }
+      if (file.size > maxSize) {
+        showError(`${file.name}: File size must be less than 10MB (${(file.size / 1024 / 1024).toFixed(2)}MB)`);
+        return;
+      }
+      validFiles.push(file);
+    }
+
+    if (validFiles.length === 0) {
+      showError('No valid files to upload');
+      return;
+    }
+
+    try {
+      console.log(`Starting upload of ${validFiles.length} images...`);
+      showSuccess(`Uploading ${validFiles.length} images...`);
+
+      // Create FormData for upload
+      const uploadData = new FormData();
+      validFiles.forEach((file, index) => {
+        console.log(`Adding file ${index + 1} to FormData:`, file.name);
+        uploadData.append('images', file);
+      });
+
+      // Log FormData contents
+      console.log('FormData entries:');
+      for (let pair of uploadData.entries()) {
+        console.log(pair[0], pair[1]);
       }
 
-      try {
-        showSuccess(`Uploading ${validFiles.length} images...`);
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      const headers = {
+        ...(token && { 'Authorization': `Bearer ${token}` })
+      };
 
-        // Create FormData for upload
-        const uploadData = new FormData();
-        validFiles.forEach(file => {
-          uploadData.append('images', file);
-        });
+      console.log('Making upload request to:', `${apiUrl}/upload/project-images`);
 
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-        const headers = {
-          ...(token && { 'Authorization': `Bearer ${token}` })
-        };
+      const response = await fetch(`${apiUrl}/upload/project-images`, {
+        method: 'POST',
+        headers,
+        body: uploadData,
+        credentials: 'include'
+      });
 
-        const response = await fetch(`${apiUrl}/upload/project-images`, {
-          method: 'POST',
-          headers,
-          body: uploadData,
-          credentials: 'include'
-        });
+      console.log('Upload response status:', response.status);
+      const result = await response.json();
+      console.log('Upload response data:', result);
 
-        const result = await response.json();
+      if (response.ok && result.success) {
+        if (result.data && result.data.length > 0) {
+          // Add new images to existing images
+          const newImages = result.data.map(img => ({
+            url: img.url,
+            publicId: img.publicId,
+            caption: '',
+            isHero: false
+          }));
 
-        if (response.ok && result.success) {
-          if (result.data && result.data.length > 0) {
-            // Add new images to existing images
-            const newImages = result.data.map(img => ({
-              url: img.url,
-              publicId: img.publicId,
-              caption: '',
-              isHero: false
-            }));
-
-            setFormData(prev => ({
-              ...prev,
-              images: [...(prev.images || []), ...newImages]
-            }));
-            showSuccess(`${result.data.length} images uploaded successfully!`);
-          } else {
-            throw new Error('No image URLs returned from server');
-          }
+          setFormData(prev => ({
+            ...prev,
+            images: [...(prev.images || []), ...newImages]
+          }));
+          showSuccess(`${result.data.length} images uploaded successfully!`);
+          console.log('Images added to form data:', newImages);
         } else {
-          throw new Error(result.message || 'Upload failed');
+          throw new Error('No image URLs returned from server');
         }
-      } catch (error) {
-        console.error('Multiple images upload error:', error);
-        showError(error.message || 'Failed to upload images. Please try again.');
+      } else {
+        throw new Error(result.message || 'Upload failed');
       }
+    } catch (error) {
+      console.error('Multiple images upload error:', error);
+      showError(error.message || 'Failed to upload images. Please try again.');
     }
   };
 

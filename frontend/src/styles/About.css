@@ -393,6 +393,34 @@
   box-shadow: var(--shadow-lg);
 }
 
+/* Empty State Styles */
+.empty-state {
+  text-align: center;
+  padding: var(--space-12) var(--space-6);
+  color: var(--text-secondary);
+}
+
+.empty-state .empty-icon {
+  color: var(--text-muted);
+  margin-bottom: var(--space-4);
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.empty-state p {
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+  max-width: 400px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .hero-title {
@@ -426,6 +454,39 @@
     grid-template-columns: 1fr;
     gap: var(--space-6);
   }
+
+  .team-card {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .member-image {
+    height: 250px;
+  }
+
+  .member-info {
+    padding: var(--space-5);
+  }
+
+  .member-name {
+    font-size: var(--text-xl);
+    margin-bottom: var(--space-2);
+  }
+
+  .member-position {
+    font-size: var(--text-base);
+    margin-bottom: var(--space-1);
+  }
+
+  .member-experience {
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-3);
+  }
+
+  .member-bio {
+    font-size: var(--text-sm);
+    line-height: 1.6;
+  }
   
   .timeline::before {
     left: var(--space-4);
@@ -450,23 +511,105 @@
 @media (max-width: 480px) {
   .hero-stats {
     grid-template-columns: 1fr;
-    gap: var(--space-6);
+    gap: var(--space-4);
+    max-width: 250px;
+    margin: var(--space-6) auto;
   }
-  
+
+  .stat {
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+    background: var(--glass-bg);
+    border: 1px solid var(--border-primary);
+  }
+
   .stat-number {
     font-size: var(--text-3xl);
+    margin-bottom: var(--space-2);
   }
-  
+
+  .stat-label {
+    font-size: var(--text-sm);
+  }
+
   .mission,
   .vision {
-    padding: var(--space-6);
+    padding: var(--space-5);
   }
-  
+
   .value-card {
-    padding: var(--space-6);
+    padding: var(--space-5);
   }
-  
+
+  .value-title {
+    font-size: var(--text-lg);
+  }
+
+  .value-description {
+    font-size: var(--text-sm);
+  }
+
+  .team-card {
+    max-width: 100%;
+  }
+
+  .member-image {
+    height: 220px;
+  }
+
+  .member-info {
+    padding: var(--space-4);
+  }
+
+  .member-name {
+    font-size: var(--text-lg);
+  }
+
+  .member-bio {
+    font-size: var(--text-xs);
+  }
+
+  .timeline-item:nth-child(odd) .timeline-content,
+  .timeline-item:nth-child(even) .timeline-content {
+    margin-left: var(--space-10);
+    padding: var(--space-4);
+  }
+
+  .timeline-year {
+    font-size: var(--text-base);
+  }
+
+  .timeline-event {
+    font-size: var(--text-base);
+  }
+
+  .timeline-description {
+    font-size: var(--text-xs);
+  }
+
   .cta-content h2 {
     font-size: var(--text-3xl);
+  }
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+  .team-card,
+  .value-card {
+    transition: none;
+  }
+
+  .team-card:hover,
+  .value-card:hover {
+    transform: none;
+  }
+
+  .team-card:hover .member-image img {
+    transform: none;
+  }
+
+  .cta-button {
+    min-height: 44px; /* Minimum touch target size */
+    padding: var(--space-4) var(--space-6);
   }
 }

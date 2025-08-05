@@ -245,29 +245,113 @@
 /* Responsive Design */
 @media (max-width: 768px) {
   .project-card .card-image {
-    height: 200px;
+    height: 220px;
   }
-  
+
   .project-card .card-content {
-    padding: var(--space-4);
+    padding: var(--space-5);
   }
-  
+
   .project-title {
-    font-size: var(--text-lg);
+    font-size: var(--text-xl);
+    line-height: 1.3;
+    margin-bottom: var(--space-3);
   }
-  
+
+  .project-description {
+    font-size: var(--text-sm);
+    line-height: 1.5;
+    margin-bottom: var(--space-4);
+  }
+
   .detail-row {
     grid-template-columns: 1fr;
     gap: var(--space-3);
+  }
+
+  .detail-item {
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    background: var(--glass-bg);
+    border: 1px solid var(--border-primary);
+  }
+
+  .detail-label {
+    font-size: var(--text-xs);
+    margin-bottom: var(--space-1);
+  }
+
+  .detail-value {
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+
+  .view-details-btn {
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-sm);
+    margin-top: var(--space-4);
   }
 }
 
 @media (max-width: 480px) {
   .project-card .card-image {
-    height: 180px;
+    height: 200px;
   }
-  
+
+  .project-card .card-content {
+    padding: var(--space-4);
+  }
+
+  .project-title {
+    font-size: var(--text-lg);
+  }
+
+  .project-description {
+    font-size: var(--text-xs);
+    margin-bottom: var(--space-3);
+  }
+
   .progress-circle {
     transform: scale(0.8);
+  }
+
+  .detail-item {
+    padding: var(--space-2);
+  }
+
+  .detail-label {
+    font-size: var(--text-xs);
+  }
+
+  .detail-value {
+    font-size: var(--text-xs);
+  }
+
+  .view-details-btn {
+    padding: var(--space-3);
+    font-size: var(--text-xs);
+  }
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+  .project-card {
+    transition: none;
+  }
+
+  .project-card:hover {
+    transform: none;
+  }
+
+  .project-card:hover .card-image img {
+    transform: none;
+  }
+
+  .card-overlay {
+    opacity: 1; /* Always show progress on touch devices */
+  }
+
+  .view-details-btn {
+    min-height: 44px; /* Minimum touch target size */
   }
 }

@@ -4,6 +4,7 @@ import { Provider } from 'react-redux'
 import { ToastContainer } from 'react-toastify'
 import { store } from './store/store'
 import './styles/index.css'
+import './styles/MobileResponsive.css'
 import 'react-toastify/dist/ReactToastify.css'
 import App from './App.jsx'
 
