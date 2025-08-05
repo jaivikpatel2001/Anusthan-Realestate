@@ -37,6 +37,8 @@ const ProjectForm = ({
     totalUnits: '',
     availableUnits: '',
     heroImage: '',
+    images: [], // Added this field
+    brochure: null, // Added this field
     features: [],
     amenities: [],
     specifications: {
@@ -102,6 +104,8 @@ const ProjectForm = ({
         totalUnits: project.totalUnits || '',
         availableUnits: project.availableUnits || '',
         heroImage: project.heroImage || '',
+        images: project.images || [], // Populate images array
+        brochure: project.brochure || null, // Populate brochure object
         features: project.features || [],
         amenities: project.amenities || [],
         specifications: {
@@ -207,39 +211,7 @@ const ProjectForm = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  // Helper function to sanitize data and remove any DOM elements or File objects
-  const sanitizeData = (obj) => {
-    if (obj === null || obj === undefined) return obj;
 
-    // Check if it's a DOM element or File object
-    if (obj instanceof Element || obj instanceof File || obj instanceof FileList) {
-      return null;
-    }
-
-    // Handle arrays
-    if (Array.isArray(obj)) {
-      return obj.map(item => sanitizeData(item)).filter(item => item !== null);
-    }
-
-    // Handle objects
-    if (typeof obj === 'object') {
-      const sanitized = {};
-      for (const [key, value] of Object.entries(obj)) {
-        // Skip the _file property which contains the actual File object
-        if (key === '_file') {
-          continue;
-        }
-        const sanitizedValue = sanitizeData(value);
-        if (sanitizedValue !== null) {
-          sanitized[key] = sanitizedValue;
-        }
-      }
-      return sanitized;
-    }
-
-    // Return primitive values as-is
-    return obj;
-  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -461,12 +433,6 @@ const ProjectForm = ({
         uploadData.append('images', file);
       });
 
-      // Log FormData contents
-      console.log('FormData entries:');
-      for (let pair of uploadData.entries()) {
-        console.log(pair[0], pair[1]);
-      }
-
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
       const headers = {
         ...(token && { 'Authorization': `Bearer ${token}` })
@@ -514,75 +480,136 @@ const ProjectForm = ({
   };
 
   // Brochure upload handling
+  // Enhanced brochure upload handling with better validation
   const handleBrochureUpload = async (name, files) => {
-    if (files && files.length > 0) {
-      const file = files[0];
+    console.log('Brochure upload triggered:', { name, files, filesLength: files?.length });
 
-      // Validate file type
-      if (file.type !== 'application/pdf') {
-        showError('Please select a PDF file for the brochure');
-        return;
-      }
+    if (!files || files.length === 0) {
+      console.log('No brochure file selected');
+      return;
+    }
 
-      // Validate file size (10MB max)
-      const maxSize = 10 * 1024 * 1024; // 10MB
-      if (file.size > maxSize) {
-        showError('File size must be less than 10MB');
-        return;
-      }
+    const file = files[0];
+    const actualFile = file._file || file;
 
-      try {
-        showSuccess('Uploading brochure...');
+    console.log('Validating brochure file:', {
+      name: actualFile.name,
+      type: actualFile.type,
+      size: actualFile.size
+    });
 
-        // Create FormData for upload
-        const uploadData = new FormData();
-        const actualFile = file._file || file;
-        uploadData.append('brochure', actualFile);
+    // Validate file type
+    if (actualFile.type !== 'application/pdf') {
+      showError('Please select a PDF file for the brochure');
+      return;
+    }
 
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-        const headers = {
-          ...(token && { 'Authorization': `Bearer ${token}` })
-        };
+    // Validate file size (10MB max)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (actualFile.size > maxSize) {
+      showError(`File size must be less than 10MB (${(actualFile.size / 1024 / 1024).toFixed(2)}MB)`);
+      return;
+    }
 
-        const response = await fetch(`${apiUrl}/upload/brochures`, {
-          method: 'POST',
-          headers,
-          body: uploadData,
-          credentials: 'include'
-        });
+    try {
+      showSuccess('Uploading brochure...');
 
-        const result = await response.json();
+      const uploadData = new FormData();
+      uploadData.append('brochure', actualFile);
 
-        if (response.ok && result.success) {
-          if (result.data) {
-            setFormData(prev => ({
-              ...prev,
-              brochure: {
-                url: result.data.url,
-                publicId: result.data.publicId,
-                filename: result.data.originalName
-              }
-            }));
-            showSuccess('Brochure uploaded successfully!');
-          } else {
-            throw new Error('No brochure URL returned from server');
-          }
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      const headers = {
+        ...(token && { 'Authorization': `Bearer ${token}` })
+      };
+
+      console.log('Making brochure upload request to:', `${apiUrl}/upload/brochures`);
+
+      const response = await fetch(`${apiUrl}/upload/brochures`, {
+        method: 'POST',
+        headers,
+        body: uploadData,
+        credentials: 'include'
+      });
+
+      console.log('Brochure upload response status:', response.status);
+      const result = await response.json();
+      console.log('Brochure upload response data:', result);
+
+      if (response.ok && result.success) {
+        if (result.data) {
+          setFormData(prev => ({
+            ...prev,
+            brochure: {
+              url: result.data.url,
+              publicId: result.data.publicId,
+              filename: result.data.originalName || actualFile.name
+            }
+          }));
+          showSuccess('Brochure uploaded successfully!');
+          console.log('Brochure added to form data:', result.data);
         } else {
-          throw new Error(result.message || 'Upload failed');
+          throw new Error('No brochure URL returned from server');
         }
-      } catch (error) {
-        console.error('Brochure upload error:', error);
-        showError(error.message || 'Failed to upload brochure. Please try again.');
+      } else {
+        throw new Error(result.message || 'Upload failed');
       }
+    } catch (error) {
+      console.error('Brochure upload error:', error);
+      showError(error.message || 'Failed to upload brochure. Please try again.');
     }
   };
 
   // Remove project image
+  // Enhanced remove project image function with better state management
   const removeProjectImage = (index) => {
     setFormData(prev => ({
       ...prev,
-      images: prev.images.filter((_, i) => i !== index)
+      images: (prev.images || []).filter((_, i) => i !== index)
     }));
+    showSuccess('Image removed successfully');
+  };
+
+  // Enhanced remove brochure function
+  const removeBrochure = () => {
+    setFormData(prev => ({ 
+      ...prev, 
+      brochure: null 
+    }));
+    showSuccess('Brochure removed successfully');
+  };
+
+  // Enhanced sanitize data function to handle images and brochure properly
+  const sanitizeData = (obj) => {
+    if (obj === null || obj === undefined) return obj;
+
+    // Check if it's a DOM element or File object
+    if (obj instanceof Element || obj instanceof File || obj instanceof FileList) {
+      return null;
+    }
+
+    // Handle arrays
+    if (Array.isArray(obj)) {
+      return obj.map(item => sanitizeData(item)).filter(item => item !== null);
+    }
+
+    // Handle objects
+    if (typeof obj === 'object') {
+      const sanitized = {};
+      for (const [key, value] of Object.entries(obj)) {
+        // Skip the _file property which contains the actual File object
+        if (key === '_file') {
+          continue;
+        }
+        const sanitizedValue = sanitizeData(value);
+        if (sanitizedValue !== null) {
+          sanitized[key] = sanitizedValue;
+        }
+      }
+      return sanitized;
+    }
+
+    // Return primitive values as-is
+    return obj;
   };
 
   const statusOptions = [
