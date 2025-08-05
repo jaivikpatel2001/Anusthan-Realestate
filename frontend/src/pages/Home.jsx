@@ -75,9 +75,7 @@ const Home = () => {
             initial="hidden"
             animate={upcomingInView ? "visible" : "hidden"}
           >
-            <div className="section-icon">
-              <FiTrendingUp size={32} />
-            </div>
+            
             <h2 className="section-title">
               Upcoming <span className="title-accent">Projects</span>
             </h2>
@@ -138,9 +136,7 @@ const Home = () => {
             initial="hidden"
             animate={ongoingInView ? "visible" : "hidden"}
           >
-            <div className="section-icon">
-              <FiClock size={32} />
-            </div>
+            
             <h2 className="section-title">
               Ongoing <span className="title-accent">Projects</span>
             </h2>
@@ -201,9 +197,7 @@ const Home = () => {
             initial="hidden"
             animate={completedInView ? "visible" : "hidden"}
           >
-            <div className="section-icon">
-              <FiCheckCircle size={32} />
-            </div>
+            
             <h2 className="section-title">
               Completed <span className="title-accent">Projects</span>
             </h2>

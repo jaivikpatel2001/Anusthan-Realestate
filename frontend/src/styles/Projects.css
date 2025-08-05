@@ -42,10 +42,9 @@
 /* Filters Section */
 .filters-section {
   margin-bottom: var(--space-12);
-  background: var(--card-bg);
+  
   border-radius: var(--radius-2xl);
-  padding: var(--space-8);
-  border: 1px solid var(--border-primary);
+  
   box-shadow: var(--shadow-sm);
 }
 

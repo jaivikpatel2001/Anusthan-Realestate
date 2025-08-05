@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { FiFilter, FiSearch } from 'react-icons/fi';
+import { FiFilter, FiSearch, FiX } from 'react-icons/fi';
 import { useGetProjectsQuery } from '../store/api/projectsApi';
 import { InlineLoading } from '../components/LoadingSpinner';
 import ProjectCard from '../components/ProjectCard';
@@ -11,51 +11,43 @@ import '../styles/Projects.css';
 
 const Projects = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [filters, setFilters] = useState({
-    status: searchParams.get('status') || '',
-    category: searchParams.get('category') || '',
-    search: searchParams.get('search') || '',
-    minPrice: searchParams.get('minPrice') || '',
-    maxPrice: searchParams.get('maxPrice') || '',
-  });
+  const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || 'all');
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
 
   const [ref, inView] = useInView({
     threshold: 0.1,
     triggerOnce: true
   });
 
-  // Fetch projects with filters
   const { data: projectsData, isLoading, error } = useGetProjectsQuery({
-    ...filters,
+    status: statusFilter === 'all' ? '' : statusFilter,
+    search: searchQuery,
     limit: 50
   });
 
   const projects = projectsData?.projects || [];
 
   useEffect(() => {
-    // Update URL params when filters change
     const params = new URLSearchParams();
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value) params.set(key, value);
-    });
-    setSearchParams(params);
-  }, [filters, setSearchParams]);
+    if (statusFilter && statusFilter !== 'all') {
+      params.set('status', statusFilter);
+    }
+    if (searchQuery) {
+      params.set('search', searchQuery);
+    }
+    setSearchParams(params, { replace: true });
+  }, [statusFilter, searchQuery, setSearchParams]);
 
-  const handleFilterChange = (key, value) => {
-    setFilters(prev => ({
-      ...prev,
-      [key]: value
-    }));
+  const handleStatusChange = (status) => {
+    setStatusFilter(status);
   };
 
-  const clearFilters = () => {
-    setFilters({
-      status: '',
-      category: '',
-      search: '',
-      minPrice: '',
-      maxPrice: '',
-    });
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const clearSearch = () => {
+    setSearchQuery('');
   };
 
   const containerVariants = {
@@ -80,6 +72,8 @@ const Projects = () => {
       }
     }
   };
+
+  const filterOptions = ['all', 'upcoming', 'ongoing', 'completed'];
 
   return (
     <section className="projects-page" ref={ref}>
@@ -107,52 +101,19 @@ const Projects = () => {
           animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ delay: 0.3 }}
         >
-          <div className="filters-grid">
-            <div className="filter-group">
-              <label>Status</label>
-              <select
-                value={filters.status}
-                onChange={(e) => handleFilterChange('status', e.target.value)}
+          <div className="filter-buttons">
+            {filterOptions.map(option => (
+              <button
+                key={option}
+                className={`filter-btn ${statusFilter === option ? 'active' : ''}`}
+                onClick={() => handleStatusChange(option)}
               >
-                <option value="">All Status</option>
-                <option value="upcoming">Upcoming</option>
-                <option value="ongoing">Ongoing</option>
-                <option value="completed">Completed</option>
-              </select>
-            </div>
-
-            <div className="filter-group">
-              <label>Category</label>
-              <select
-                value={filters.category}
-                onChange={(e) => handleFilterChange('category', e.target.value)}
-              >
-                <option value="">All Categories</option>
-                <option value="residential">Residential</option>
-                <option value="commercial">Commercial</option>
-                <option value="mixed">Mixed Use</option>
-              </select>
-            </div>
-
-            <div className="filter-group">
-              <label>Search</label>
-              <div className="search-input">
-                <FiSearch size={18} />
-                <input
-                  type="text"
-                  placeholder="Search projects..."
-                  value={filters.search}
-                  onChange={(e) => handleFilterChange('search', e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className="filter-actions">
-              <button className="clear-filters" onClick={clearFilters}>
-                Clear All
+                {option.charAt(0).toUpperCase() + option.slice(1)}
               </button>
-            </div>
+            ))}
           </div>
+
+          
         </motion.div>
 
         {/* Projects Grid */}
@@ -166,10 +127,7 @@ const Projects = () => {
           <div className="no-projects">
             <FiFilter size={48} />
             <h3>No Projects Found</h3>
-            <p>Try adjusting your filters to see more results.</p>
-            <button className="clear-filters" onClick={clearFilters}>
-              Clear Filters
-            </button>
+            <p>Try adjusting your filters or search to see more results.</p>
           </div>
         ) : (
           <motion.div
