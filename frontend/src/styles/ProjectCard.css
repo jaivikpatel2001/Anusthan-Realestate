@@ -7,12 +7,14 @@
   transition: var(--transition-normal);
   position: relative;
   box-shadow: var(--shadow-sm);
+  width: 100%;
 }
 
 .project-card.modern:hover {
   border-color: var(--accent-primary);
   box-shadow: var(--shadow-xl);
   transform: translateY(-4px);
+  
 }
 
 /* Card Image */

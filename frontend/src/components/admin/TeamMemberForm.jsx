@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FiUpload, FiX } from 'react-icons/fi';
+import { useSelector } from 'react-redux';
 import FormField from './FormField';
 import { useUploadImageMutation } from '../../store/api/uploadApi';
 import { useToast } from '../../hooks/useToast';
+import { selectCurrentUser } from '../../store/slices/authSlice';
 
 const TeamMemberForm = ({ 
   initialData = null, 
@@ -12,6 +14,15 @@ const TeamMemberForm = ({
   isLoading = false,
   showSubmitButton = true 
 }) => {
+  const currentUser = useSelector(selectCurrentUser);
+  
+  // Debug: Log current user and auth state
+  useEffect(() => {
+    console.log('Current user from Redux:', currentUser);
+    console.log('User object keys:', currentUser ? Object.keys(currentUser) : 'No user');
+    console.log('Is user authenticated?', !!(currentUser?._id || currentUser?.id));
+  }, [currentUser]);
+  
   const [formData, setFormData] = useState({
     name: '',
     position: '',
@@ -33,7 +44,8 @@ const TeamMemberForm = ({
     specializations: [],
     achievements: [],
     isActive: true,
-    sortOrder: 0
+    sortOrder: 0,
+    createdBy: currentUser?._id || ''
   });
 
   const [imageFile, setImageFile] = useState(null);
@@ -68,15 +80,21 @@ const TeamMemberForm = ({
         specializations: initialData.specializations || [],
         achievements: initialData.achievements || [],
         isActive: initialData.isActive !== undefined ? initialData.isActive : true,
-        sortOrder: initialData.sortOrder || 0
+        sortOrder: initialData.sortOrder || 0,
+        createdBy: initialData.createdBy || currentUser?._id || ''
       });
       setImagePreview(initialData.image?.url || '');
+    } else if (currentUser?._id) {
+      // For new records, ensure createdBy is set
+      setFormData(prev => ({
+        ...prev,
+        createdBy: currentUser._id
+      }));
     }
-  }, [initialData]);
+  }, [initialData, currentUser]);
 
   // Handle input changes
   const handleInputChange = (name, value) => {
-    // use name and value directly
     if (name.includes('.')) {
       const [parent, child] = name.split('.');
       setFormData(prev => ({
@@ -108,6 +126,20 @@ const TeamMemberForm = ({
       reader.onload = (e) => setImagePreview(e.target.result);
       reader.readAsDataURL(file);
     }
+  };
+
+  // Remove image
+  const handleImageRemove = () => {
+    setImageFile(null);
+    setImagePreview('');
+    setFormData(prev => ({
+      ...prev,
+      image: {
+        url: '',
+        publicId: '',
+        alt: ''
+      }
+    }));
   };
 
   // Handle image upload
@@ -170,6 +202,15 @@ const TeamMemberForm = ({
     e.preventDefault();
     
     try {
+      // Debug: Log current user at submission time
+      console.log('Form submission - current user:', currentUser);
+      
+      const userId = currentUser?._id || currentUser?.id;
+      if (!userId) {
+        console.error('No user ID found in Redux store. User object:', currentUser);
+        throw new Error('User not authenticated - please log in again');
+      }
+
       let imageUrl = formData.image.url;
       
       // Upload image if new file selected
@@ -177,22 +218,46 @@ const TeamMemberForm = ({
         imageUrl = await handleImageUpload();
       }
 
+      // Prepare the data with proper types and structure
       const submitData = {
-        ...formData,
+        name: formData.name.trim(),
+        position: formData.position.trim(),
+        experienceYears: Number(formData.experienceYears) || 0,
+        description: formData.description.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim(),
+        isActive: formData.isActive,
+        sortOrder: Number(formData.sortOrder) || 0,
+        createdBy: currentUser._id || currentUser.id,
         image: {
-          ...formData.image,
-          url: imageUrl
-        }
+          url: imageUrl,
+          publicId: formData.image.publicId || '',
+          alt: formData.image.alt || ''
+        },
+        socialLinks: {
+          linkedin: formData.socialLinks.linkedin || '',
+          twitter: formData.socialLinks.twitter || '',
+          facebook: formData.socialLinks.facebook || '',
+          instagram: formData.socialLinks.instagram || ''
+        },
+        specializations: formData.specializations || [],
+        achievements: formData.achievements || []
       };
+      
+      // Remove empty strings from arrays
+      submitData.specializations = submitData.specializations.filter(item => item.trim() !== '');
+      submitData.achievements = submitData.achievements.filter(item => item.trim() !== '');
 
+      console.log('Submitting team member data:', JSON.stringify(submitData, null, 2));
       await onSubmit(submitData);
     } catch (error) {
       console.error('Form submission error:', error);
+      showError(error?.message || error?.data?.message || 'Failed to save team member. Please try again.');
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="team-member-form">
+    <form id="modal-form" onSubmit={handleSubmit} className="team-member-form">
       <div className="form-grid">
         {/* Basic Information */}
         <div className="form-section">
@@ -240,45 +305,65 @@ const TeamMemberForm = ({
           />
         </div>
 
-        {/* Image Upload */}
-        <div className="form-section">
-          <h3>Profile Image</h3>
-          
-          <div className="image-upload-section">
-            <div className="image-preview">
+        {/* Image Upload Preview */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Profile Image
+          </label>
+          <div className="flex items-center space-x-4">
+            <div className="relative">
               {imagePreview ? (
-                <img src={imagePreview} alt="Preview" className="preview-img" />
+                <div className="relative group">
+                  <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-gray-200 bg-gray-100">
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleImageRemove}
+                    className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-md hover:bg-red-600"
+                    title="Remove image"
+                  >
+                    <FiX className="h-3 w-3" />
+                  </button>
+                </div>
               ) : (
-                <div className="preview-placeholder">
-                  <FiUpload size={48} />
-                  <p>No image selected</p>
+                <div className="w-24 h-24 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center">
+                  <FiUpload className="h-6 w-6 text-gray-400" />
                 </div>
               )}
             </div>
-            
-            <div className="upload-controls">
+            <div>
               <input
                 type="file"
                 id="image-upload"
                 accept="image/*"
                 onChange={handleImageSelect}
-                style={{ display: 'none' }}
+                className="hidden"
               />
-              <label htmlFor="image-upload" className="btn btn-outline">
-                <FiUpload size={16} />
-                Choose Image
+              <label
+                htmlFor="image-upload"
+                className="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer"
+              >
+                {imagePreview ? 'Change' : 'Upload Image'}
               </label>
-              <small>Max size: 5MB. Recommended: 400x400px</small>
+              {imagePreview && (
+                <button
+                  type="button"
+                  onClick={handleImageRemove}
+                  className="ml-2 inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                >
+                  Remove
+                </button>
+              )}
+              <p className="mt-2 text-xs text-gray-500">
+                Recommended: 400×400px (1:1 ratio)
+              </p>
             </div>
           </div>
-
-          <FormField
-            label="Image Alt Text"
-            name="image.alt"
-            value={formData.image.alt}
-            onChange={handleInputChange}
-            placeholder="Alternative text for the image"
-          />
         </div>
 
         {/* Contact Information */}
@@ -322,6 +407,84 @@ const TeamMemberForm = ({
             onChange={handleInputChange}
             placeholder="Twitter profile URL"
           />
+        </div>
+
+        {/* Specializations */}
+        <div className="form-section">
+          <h3>Specializations</h3>
+          
+          <div className="tag-input-section">
+            <div className="tag-input">
+              <input
+                type="text"
+                value={specializationInput}
+                onChange={(e) => setSpecializationInput(e.target.value)}
+                placeholder="Add specialization..."
+                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSpecialization())}
+              />
+              <button
+                type="button"
+                onClick={addSpecialization}
+                className="add-tag-btn"
+              >
+                Add
+              </button>
+            </div>
+            
+            <div className="tags-list">
+              {formData.specializations.map((spec, index) => (
+                <span key={index} className="tag">
+                  {spec}
+                  <button
+                    type="button"
+                    onClick={() => removeSpecialization(index)}
+                    className="remove-tag-btn"
+                  >
+                    <FiX size={14} />
+                  </button>
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Achievements */}
+        <div className="form-section">
+          <h3>Achievements</h3>
+          
+          <div className="tag-input-section">
+            <div className="tag-input">
+              <input
+                type="text"
+                value={achievementInput}
+                onChange={(e) => setAchievementInput(e.target.value)}
+                placeholder="Add achievement..."
+                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addAchievement())}
+              />
+              <button
+                type="button"
+                onClick={addAchievement}
+                className="add-tag-btn"
+              >
+                Add
+              </button>
+            </div>
+            
+            <div className="tags-list">
+              {formData.achievements.map((achievement, index) => (
+                <span key={index} className="tag">
+                  {achievement}
+                  <button
+                    type="button"
+                    onClick={() => removeAchievement(index)}
+                    className="remove-tag-btn"
+                  >
+                    <FiX size={14} />
+                  </button>
+                </span>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Settings */}

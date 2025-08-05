@@ -548,13 +548,11 @@
   }
 
   .filter-buttons {
-    flex-direction: column;
+   
     align-items: center;
   }
 
-  .filter-btn {
-    width: 200px;
-  }
+ 
 
   .card-details {
     grid-template-columns: 1fr;

@@ -337,7 +337,7 @@ const ProjectDetail = () => {
               <div className="detail-card images-gallery">
                 <div className="gallery-header">
                   <h3>
-                    <FiImage size={20} />
+                    
                     Project Gallery
                   </h3>
                   <button

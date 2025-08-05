@@ -206,6 +206,7 @@
 }
 
 .team-card {
+  max-width: 400px;
   background: var(--primary-bg);
   border-radius: var(--radius-2xl);
   overflow: hidden;

@@ -18,7 +18,6 @@ const FormModal = ({
   ...props
 }) => {
   const modalRef = useRef(null);
-  const firstInputRef = useRef(null);
 
   // Handle escape key
   useEffect(() => {
@@ -56,7 +55,22 @@ const FormModal = ({
     }
   };
 
-
+  // Handle form submission
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    if (onSubmit) {
+      // Find the form inside the modal and trigger its submit event
+      const form = modalRef.current?.querySelector('#modal-form');
+      if (form) {
+        // Create and dispatch a submit event
+        const submitEvent = new Event('submit', { 
+          bubbles: true, 
+          cancelable: true 
+        });
+        form.dispatchEvent(submitEvent);
+      }
+    }
+  };
 
   const getSizeClasses = () => {
     switch (size) {
@@ -140,37 +154,38 @@ const FormModal = ({
             {/* Modal Body */}
             <div className="modal-body">
               {children}
+            </div>
 
-              {showFooter && (
-                <div className="modal-footer">
+            {/* Modal Footer */}
+            {showFooter && (
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={onClose}
+                  disabled={isLoading}
+                >
+                  {cancelText}
+                </button>
+                {onSubmit && (
                   <button
                     type="button"
-                    className="btn btn-secondary"
-                    onClick={onClose}
+                    className="btn btn-primary"
+                    onClick={handleFormSubmit}
                     disabled={isLoading}
                   >
-                    {cancelText}
+                    {isLoading ? (
+                      <>
+                        <LoadingSpinner size="small" color="white" showText={false} />
+                        Processing...
+                      </>
+                    ) : (
+                      submitText
+                    )}
                   </button>
-                  {onSubmit && (
-                    <button
-                      type="submit"
-                      form="modal-form"
-                      className="btn btn-primary"
-                      disabled={isLoading}
-                    >
-                      {isLoading ? (
-                        <>
-                          <LoadingSpinner size="small" color="white" showText={false} />
-                          Processing...
-                        </>
-                      ) : (
-                        submitText
-                      )}
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
           </motion.div>
         </motion.div>
       )}
