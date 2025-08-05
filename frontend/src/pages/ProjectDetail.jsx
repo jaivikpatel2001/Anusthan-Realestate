@@ -221,12 +221,7 @@ const ProjectDetail = () => {
               </Link>
               
               <div className="project-badges">
-                <span 
-                  className="status-badge" 
-                  style={{ backgroundColor: getStatusColor() }}
-                >
-                  {project.status?.charAt(0).toUpperCase() + project.status?.slice(1)}
-                </span>
+                
                 {project.isFeatured && (
                   <span className="featured-badge">
                     <FiTrendingUp size={14} />

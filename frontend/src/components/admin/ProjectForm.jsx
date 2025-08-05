@@ -646,7 +646,7 @@ const ProjectForm = ({
               accept="image/jpeg,image/jpg,image/png,image/webp"
               onChange={handleImageUpload}
               error={errors.heroImage}
-              required
+              //required
               helpText="Upload an image file (JPG, PNG, WebP). Maximum size: 10MB"
             />
 
