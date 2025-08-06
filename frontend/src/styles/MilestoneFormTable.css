@@ -1,0 +1,73 @@
+/* MilestoneFormTable.css */
+.milestone-form-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--space-4) 0;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.milestone-form-table th,
+.milestone-form-table td {
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.milestone-form-table th {
+  background-color: var(--primary-50);
+  color: var(--primary-700);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: var(--text-xs);
+  letter-spacing: 0.5px;
+}
+
+.milestone-form-table tr:last-child td {
+  border-bottom: none;
+}
+
+.milestone-form-table tr:hover {
+  background-color: var(--gray-50);
+}
+
+/* Form elements */
+.milestone-form-table input,
+.milestone-form-table textarea {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.milestone-form-table input:focus,
+.milestone-form-table textarea:focus {
+  outline: none;
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px var(--primary-100);
+}
+
+/* Action buttons */
+.milestone-actions {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: flex-end;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .milestone-form-table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .milestone-form-table th,
+  .milestone-form-table td {
+    padding: var(--space-2) var(--space-3);
+  }
+}
