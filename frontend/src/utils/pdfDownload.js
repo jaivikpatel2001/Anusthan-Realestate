@@ -12,8 +12,13 @@
  */
 export const downloadPDF = async (url, filename, showError = null) => {
   try {
-    const fullUrl = url.startsWith('http') ? url : 
-                  (url.startsWith('/') ? `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${url}` : url);
+    // Use the full URL as stored in the database
+    let fullUrl = url;
+    
+    // If for some reason the URL is relative, ensure it's properly formed
+    if (!url.startsWith('http') && url.startsWith('/')) {
+      fullUrl = `${import.meta.env.VITE_IMAGE_URL || 'http://localhost:5000'}${url}`;
+    }
     
     console.log(`Starting PDF download: ${filename} from ${fullUrl}`);
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useDownloadBrochureMutation } from '../store/api/leadsApi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import {
@@ -101,6 +102,8 @@ const ProjectDetail = () => {
     setShowBrochureForm(true);
   };
 
+  const [downloadBrochure] = useDownloadBrochureMutation();
+
   const handleBrochureFormSubmit = async (e) => {
     e.preventDefault();
 
@@ -113,47 +116,35 @@ const ProjectDetail = () => {
     const loadingToast = showSuccess('Processing your request...', { autoClose: false });
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/leads/brochure`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          name: brochureFormData.name,
-          email: brochureFormData.email,
-          mobile: brochureFormData.mobile,
-          projectId: project._id
-        }),
-      });
+      // First, submit the lead information
+      await downloadBrochure({
+        name: brochureFormData.name,
+        email: brochureFormData.email,
+        mobile: brochureFormData.mobile,
+        projectId: project._id
+      }).unwrap();
 
-      const result = await response.json();
+      // Close form and reset
+      setShowBrochureForm(false);
+      setBrochureFormData({ name: '', email: '', mobile: '' });
 
-      if (response.ok && result.success) {
-        // Close form and reset
-        setShowBrochureForm(false);
-        setBrochureFormData({ name: '', email: '', mobile: '' });
-
-        // Close loading toast
-        if (loadingToast && typeof loadingToast.close === 'function') {
-          loadingToast.close();
-        }
-
-        // Trigger download with enhanced error handling
-        try {
-          await downloadPDF(
-            result.data.brochureUrl, 
-            `${result.data.projectTitle}-Brochure.pdf`, 
-            showError
-          );
-          showSuccess('Brochure download started!');
-        } catch (downloadError) {
-          console.error('Download error:', downloadError);
-          showError('Failed to start download. Please try again.');
-        }
-      } else {
-        throw new Error(result.message || 'Failed to submit form');
+      // Close loading toast
+      if (loadingToast && typeof loadingToast.close === 'function') {
+        loadingToast.close();
       }
+
+      // Then, trigger the download
+      const brochureUrl = project.brochure || project.brochureUrl;
+      if (!brochureUrl) {
+        throw new Error('Brochure URL not found');
+      }
+      
+      await downloadPDF(
+        brochureUrl, 
+        `${project.title || 'project'}-brochure.pdf`, 
+        showError
+      );
+      showSuccess('Brochure download started!');
     } catch (error) {
       console.error('Brochure form submission error:', error);
       showError(error.message || 'Failed to submit form. Please try again.');

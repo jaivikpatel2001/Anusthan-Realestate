@@ -55,7 +55,11 @@ export const projectsApi = apiSlice.injectEndpoints({
           images: project.images?.map(img => ({
             ...img,
             url: createImageUrl(img.url)
-          })) || []
+          })) || [],
+          brochure: project.brochure ? {
+            ...project.brochure,
+            url: createImageUrl(project.brochure.url)
+          } : null
         };
       },
     }),
