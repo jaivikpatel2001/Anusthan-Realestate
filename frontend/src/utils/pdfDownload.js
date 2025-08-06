@@ -4,70 +4,40 @@
  */
 
 /**
- * Download a PDF file with enhanced error handling
+ * Simple PDF download utility that opens the PDF in a new tab
  * @param {string} url - The URL of the PDF file
  * @param {string} filename - The desired filename for download
  * @param {Function} showError - Error toast function (optional)
- * @returns {Promise<boolean>} - Success status
  */
-export const downloadPDF = async (url, filename, showError = null) => {
+export const downloadPDF = (url, filename, showError = null) => {
   try {
-    // Use the full URL as stored in the database
-    let fullUrl = url;
-    
-    // If for some reason the URL is relative, ensure it's properly formed
-    if (!url.startsWith('http') && url.startsWith('/')) {
-      fullUrl = `${import.meta.env.VITE_IMAGE_URL || 'http://localhost:5000'}${url}`;
+    // Ensure URL is a string
+    if (typeof url !== 'string') {
+      url = String(url);
     }
     
-    console.log(`Starting PDF download: ${filename} from ${fullUrl}`);
-
-    // Fetch the PDF as a blob to ensure complete download
-    const response = await fetch(fullUrl, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/pdf',
-        'Cache-Control': 'no-cache',
-      },
-      credentials: 'include' // Include cookies for authenticated requests
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+    // Handle relative URLs
+    if (!url.startsWith('http') && !url.startsWith('blob:')) {
+      // Remove any leading slashes to prevent double slashes
+      const cleanPath = url.replace(/^\/+/, '');
+      url = `${import.meta.env.VITE_IMAGE_URL || 'http://localhost:5000'}/${cleanPath}`;
     }
-
-    const blob = await response.blob();
     
-    // Verify it's a PDF
-    if (blob.type !== 'application/pdf' && !blob.type.includes('pdf')) {
-      console.warn('Downloaded file may not be a valid PDF:', blob.type);
-    }
-
-    // Check if blob has content
-    if (blob.size === 0) {
-      throw new Error('Downloaded file is empty');
-    }
-
-    // Create download link
-    const downloadUrl = window.URL.createObjectURL(blob);
+    console.log(`Opening PDF: ${filename} from ${url}`);
+    
+    // Create a temporary anchor element
     const link = document.createElement('a');
-    link.href = downloadUrl;
-    link.download = filename;
-    link.style.display = 'none';
+    link.href = url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.download = filename || 'document.pdf';
     
-    // Add to DOM, click, and remove
+    // Append to body, click and remove
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     
-    // Clean up the object URL after a short delay
-    setTimeout(() => {
-      window.URL.revokeObjectURL(downloadUrl);
-    }, 1000);
-
-    console.log(`PDF downloaded successfully: ${filename}, Size: ${(blob.size / 1024 / 1024).toFixed(2)} MB`);
     return true;
-
   } catch (error) {
     console.error('PDF download error:', error);
     

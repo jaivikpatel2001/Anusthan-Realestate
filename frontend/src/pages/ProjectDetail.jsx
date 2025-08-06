@@ -133,18 +133,49 @@ const ProjectDetail = () => {
         loadingToast.close();
       }
 
-      // Then, trigger the download
-      const brochureUrl = project.brochure || project.brochureUrl;
+      // Get the brochure URL - handle both string and object formats
+      let brochureUrl = '';
+      
+      // If brochure is an object, try to get the URL from common property names
+      if (project.brochure && typeof project.brochure === 'object') {
+        brochureUrl = project.brochure.url || project.brochure.path || project.brochure.link || '';
+      } 
+      // If brochure is a string
+      else if (typeof project.brochure === 'string') {
+        brochureUrl = project.brochure;
+      }
+      // Try brochureUrl as fallback
+      else if (project.brochureUrl) {
+        brochureUrl = typeof project.brochureUrl === 'string' ? project.brochureUrl : '';
+      }
+      
       if (!brochureUrl) {
         throw new Error('Brochure URL not found');
       }
       
-      await downloadPDF(
-        brochureUrl, 
-        `${project.title || 'project'}-brochure.pdf`, 
-        showError
-      );
-      showSuccess('Brochure download started!');
+      // Ensure it's a string
+      brochureUrl = String(brochureUrl).trim();
+      
+      // If it's a relative URL, make it absolute
+      if (!brochureUrl.startsWith('http')) {
+        const baseUrl = import.meta.env.VITE_IMAGE_URL || 'http://localhost:5000';
+        // Remove any leading slashes to prevent double slashes when joining
+        brochureUrl = `${baseUrl}${brochureUrl.startsWith('/') ? '' : '/'}${brochureUrl.replace(/^\/+/, '')}`;
+      }
+      
+      console.log('Initiating download from:', brochureUrl);
+      
+      // Create a temporary link and trigger download
+      const link = document.createElement('a');
+      link.href = brochureUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.download = `${project.title || 'project'}-brochure.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      showSuccess('Opening brochure...');
     } catch (error) {
       console.error('Brochure form submission error:', error);
       showError(error.message || 'Failed to submit form. Please try again.');
