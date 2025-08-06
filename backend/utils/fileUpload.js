@@ -89,17 +89,24 @@ const deleteFile = (filePath) => {
 };
 
 // Helper function to get file URL
+// const getFileUrl = (req, filePath) => {
+//   if (!filePath) return null;
+  
+//   // If it's already a full URL (Cloudinary), return as is
+//   if (filePath.startsWith('http')) {
+//     return filePath;
+//   }
+  
+//   // For local files, construct the URL
+//   const baseUrl = `${req.protocol}://${req.get('host')}`;
+//   return `${baseUrl}/${filePath.replace(/\\/g, '/')}`;
+// };
+
+
 const getFileUrl = (req, filePath) => {
-  if (!filePath) return null;
-  
-  // If it's already a full URL (Cloudinary), return as is
-  if (filePath.startsWith('http')) {
-    return filePath;
-  }
-  
-  // For local files, construct the URL
-  const baseUrl = `${req.protocol}://${req.get('host')}`;
-  return `${baseUrl}/${filePath.replace(/\\/g, '/')}`;
+  // Ensure cross-platform support
+  const relativePath = path.relative(path.join(__dirname, '..', 'uploads'), filePath);
+  return `/uploads/${relativePath.replace(/\\/g, '/')}`;
 };
 
 module.exports = {

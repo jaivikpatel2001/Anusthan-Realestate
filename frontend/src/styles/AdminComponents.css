@@ -1019,6 +1019,57 @@
   background: rgba(255, 255, 255, 0.2);
 }
 
+/* Hero Image Preview */
+.uploaded-image-preview {
+  margin-top: var(--space-3);
+}
+
+.image-preview-container {
+  position: relative;
+  display: inline-block;
+  margin-bottom: var(--space-2);
+}
+
+.image-preview {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-primary);
+  display: block;
+}
+
+.remove-hero-image-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  background: rgba(239, 68, 68, 0.9);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+  line-height: 1;
+}
+
+.remove-hero-image-btn:hover {
+  background: #dc2626;
+  transform: scale(1.1);
+}
+
+.image-url {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  word-break: break-all;
+  margin-top: var(--space-1);
+}
+
 /* Amenity Items */
 .amenity-input {
   display: flex;

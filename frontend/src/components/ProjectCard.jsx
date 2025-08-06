@@ -55,6 +55,8 @@ const ProjectCard = ({ project, index, inView, onClick, showViewDetails = false 
     return 'TBD';
   };
 
+  console.log("project.heroImage",project.heroImage || project.images?.[0]?.url || '/placeholder-project.jpg') 
+
   return (
     <motion.div
       className="project-card modern"
@@ -74,6 +76,7 @@ const ProjectCard = ({ project, index, inView, onClick, showViewDetails = false 
           alt={project.title}
           loading="lazy"
         />
+        
 
         {/* Status Badge */}
         <div className="status-badge" style={{ backgroundColor: getStatusColor() }}>
