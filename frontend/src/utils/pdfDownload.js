@@ -12,15 +12,19 @@
  */
 export const downloadPDF = async (url, filename, showError = null) => {
   try {
-    console.log(`Starting PDF download: ${filename} from ${url}`);
+    const fullUrl = url.startsWith('http') ? url : 
+                  (url.startsWith('/') ? `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${url}` : url);
+    
+    console.log(`Starting PDF download: ${filename} from ${fullUrl}`);
 
     // Fetch the PDF as a blob to ensure complete download
-    const response = await fetch(url, {
+    const response = await fetch(fullUrl, {
       method: 'GET',
       headers: {
         'Accept': 'application/pdf',
         'Cache-Control': 'no-cache',
       },
+      credentials: 'include' // Include cookies for authenticated requests
     });
 
     if (!response.ok) {

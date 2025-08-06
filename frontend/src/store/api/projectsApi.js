@@ -1,5 +1,14 @@
 import { apiSlice } from './apiSlice';
 
+const createImageUrl = (path) => {
+  if (!path) return null;
+  const baseUrl = import.meta.env.VITE_IMAGE_URL || 'http://localhost:5000';
+  if (path.startsWith(baseUrl)) {
+    return path;
+  }
+  return `${baseUrl}${path}`;
+};
+
 export const projectsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // Get all projects with filtering and pagination
@@ -22,14 +31,15 @@ export const projectsApi = apiSlice.injectEndpoints({
       providesTags: ['Project'],
       transformResponse: (response) => {
         const projects = response.data.projects;
-        return projects.map(project => ({
+        response.data.projects = projects.map(project => ({
           ...project,
-          heroImage: project.heroImage ? `${import.meta.env.VITE_IMAGE_URL || 'http://localhost:5000'}${project.heroImage}` : null,
+          heroImage: createImageUrl(project.heroImage),
           images: project.images?.map(img => ({
             ...img,
-            url: img.url ? `${import.meta.env.VITE_IMAGE_URL || 'http://localhost:5000'}${img.url}` : null
+            url: createImageUrl(img.url)
           })) || []
         }));
+        return response.data;
       },
     }),
 
@@ -41,10 +51,10 @@ export const projectsApi = apiSlice.injectEndpoints({
         const project = response.data.project;
         return {
           ...project,
-          heroImage: project.heroImage ? `${import.meta.env.VITE_IMAGE_URL || 'http://localhost:5000'}${project.heroImage}` : null,
+          heroImage: createImageUrl(project.heroImage),
           images: project.images?.map(img => ({
             ...img,
-            url: img.url ? `${import.meta.env.VITE_IMAGE_URL || 'http://localhost:5000'}${img.url}` : null
+            url: createImageUrl(img.url)
           })) || []
         };
       },
@@ -59,14 +69,15 @@ export const projectsApi = apiSlice.injectEndpoints({
       providesTags: ['Project'],
       transformResponse: (response) => {
         const projects = response.data.projects;
-        return projects.map(project => ({
+        response.data.projects = projects.map(project => ({
           ...project,
-          heroImage: project.heroImage ? `${import.meta.env.VITE_IMAGE_URL || 'http://localhost:5000'}${project.heroImage}` : null,
+          heroImage: createImageUrl(project.heroImage),
           images: project.images?.map(img => ({
             ...img,
-            url: img.url ? `${import.meta.env.VITE_IMAGE_URL || 'http://localhost:5000'}${img.url}` : null
+            url: createImageUrl(img.url)
           })) || []
         }));
+        return response.data;
       },
     }),
 
@@ -79,14 +90,15 @@ export const projectsApi = apiSlice.injectEndpoints({
       providesTags: ['Project'],
       transformResponse: (response) => {
         const projects = response.data.projects;
-        return projects.map(project => ({
+        response.data.projects = projects.map(project => ({
           ...project,
-          heroImage: project.heroImage ? `${import.meta.env.VITE_IMAGE_URL || 'http://localhost:5000'}${project.heroImage}` : null,
+          heroImage: createImageUrl(project.heroImage),
           images: project.images?.map(img => ({
             ...img,
-            url: img.url ? `${import.meta.env.VITE_IMAGE_URL || 'http://localhost:5000'}${img.url}` : null
+            url: createImageUrl(img.url)
           })) || []
         }));
+        return response.data;
       },
     }),
 

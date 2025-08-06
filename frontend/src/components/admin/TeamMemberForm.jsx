@@ -59,13 +59,18 @@ const TeamMemberForm = ({
   // Initialize form with existing data
   useEffect(() => {
     if (initialData) {
+      const getFullImageUrl = (url) => {
+        if (!url) return '';
+        if (url.startsWith('http') || url.startsWith('blob:')) return url;
+        return `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${url}`;
+      };
       setFormData({
         name: initialData.name || '',
         position: initialData.position || '',
         experienceYears: initialData.experienceYears || '',
         description: initialData.description || '',
         image: {
-          url: initialData.image?.url || '',
+          url: getFullImageUrl(initialData.image?.url || ''),
           publicId: initialData.image?.publicId || '',
           alt: initialData.image?.alt || ''
         },
@@ -83,7 +88,7 @@ const TeamMemberForm = ({
         sortOrder: initialData.sortOrder || 0,
         createdBy: initialData.createdBy || currentUser?._id || ''
       });
-      setImagePreview(initialData.image?.url || '');
+      setImagePreview(getFullImageUrl(initialData.image?.url || ''));
     } else if (currentUser?._id) {
       // For new records, ensure createdBy is set
       setFormData(prev => ({

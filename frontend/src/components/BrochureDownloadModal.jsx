@@ -60,22 +60,79 @@ const BrochureDownloadModal = () => {
       return;
     }
 
+    // Show loading state
+    const loadingToast = showSuccess('Processing your request...', { autoClose: false });
+    
     try {
-      const response = await downloadBrochure({
+      // Prepare data with correct field names for backend
+      const requestData = {
         projectId: modal.projectId,
-        ...formData,
-      }).unwrap();
+        name: formData.name,
+        email: formData.email,
+        phone: formData.mobile, // Backend expects 'phone' not 'mobile'
+        source: 'website',
+        leadType: 'brochure_download'
+      };
 
-      showSuccess(response.message);
+      console.log('Sending request with data:', requestData);
       
-      // Trigger download
-      if (response.brochureUrl) {
-        await downloadPDF(response.brochureUrl, `${response.projectTitle}-Brochure.pdf`, showError);
+      const response = await downloadBrochure(requestData).unwrap();
+
+      // Close loading toast
+      if (loadingToast && typeof loadingToast.close === 'function') {
+        loadingToast.close();
       }
 
-      handleClose();
+      // Debug log the response
+      console.log('Brochure download response:', response);
+
+      // Check if we have a brochure URL in the response
+      const brochureUrl = response.data?.brochureUrl || response.brochureUrl;
+      const projectTitle = response.data?.projectTitle || response.projectTitle;
+
+      if (brochureUrl) {
+        try {
+          // Ensure we have a proper URL (handle both relative and absolute)
+          const fullBrochureUrl = brochureUrl.startsWith('http') 
+            ? brochureUrl 
+            : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${brochureUrl}`;
+            
+          console.log('Attempting to download from URL:', fullBrochureUrl);
+          
+          await downloadPDF(
+            fullBrochureUrl, 
+            `${projectTitle || 'Brochure'}.pdf`,
+            showError
+          );
+          
+          showSuccess('Brochure download started!');
+          handleClose();
+        } catch (downloadError) {
+          console.error('Download error:', downloadError);
+          showError('Failed to start download. Please try again.');
+          // Don't close the modal on download error so user can retry
+          return;
+        }
+      } else {
+        console.error('No brochure URL in response:', response);
+        showError('Brochure URL not found in the response. Please contact support.');
+      }
     } catch (error) {
-      showError(error?.data?.message || 'Failed to download brochure');
+      console.error('Brochure download error:', error);
+      
+      // Close loading toast on error
+      if (loadingToast && typeof loadingToast.close === 'function') {
+        loadingToast.close();
+      }
+      
+      // Show more detailed error message
+      const errorMessage = error?.data?.message || 
+                         error?.error || 
+                         error?.message || 
+                         'Failed to process your request. Please try again.';
+      
+      console.error('Full error details:', error);
+      showError(errorMessage);
     }
   };
 

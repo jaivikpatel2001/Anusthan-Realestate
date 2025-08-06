@@ -29,9 +29,13 @@ const Home = () => {
   });
 
   // Fetch project data by status
-  const { data: upcomingProjects, isLoading: upcomingLoading } = useGetProjectsByStatusQuery('upcoming');
-  const { data: ongoingProjects, isLoading: ongoingLoading } = useGetProjectsByStatusQuery('ongoing');
-  const { data: completedProjects, isLoading: completedLoading } = useGetProjectsByStatusQuery('completed');
+  const { data: upcomingProjectsData, isLoading: upcomingLoading } = useGetProjectsByStatusQuery('upcoming');
+  const { data: ongoingProjectsData, isLoading: ongoingLoading } = useGetProjectsByStatusQuery('ongoing');
+  const { data: completedProjectsData, isLoading: completedLoading } = useGetProjectsByStatusQuery('completed');
+
+  const upcomingProjects = upcomingProjectsData?.projects || [];
+  const ongoingProjects = ongoingProjectsData?.projects || [];
+  const completedProjects = completedProjectsData?.projects || [];
 
   // Animation variants
   const sectionVariants = {

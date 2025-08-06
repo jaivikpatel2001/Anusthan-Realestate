@@ -363,9 +363,10 @@ const ProjectForm = ({
         if (response.ok && result.success) {
           if (result.data && result.data.length > 0) {
             // Update the heroImage field with the uploaded image URL
+            const imageUrl = `${import.meta.env.VITE_IMAGE_URL || 'http://localhost:5000'}${result.data[0].url}`;
             setFormData(prev => ({
               ...prev,
-              heroImage: result.data[0].url
+              heroImage: imageUrl
             }));
             showSuccess('Image uploaded successfully!');
           } else {
@@ -455,7 +456,7 @@ const ProjectForm = ({
         if (result.data && result.data.length > 0) {
           // Add new images to existing images
           const newImages = result.data.map(img => ({
-            url: img.url,
+            url: `${import.meta.env.VITE_IMAGE_URL || 'http://localhost:5000'}${img.url}`,
             publicId: img.publicId,
             caption: '',
             isHero: false
@@ -537,10 +538,11 @@ const ProjectForm = ({
 
       if (response.ok && result.success) {
         if (result.data) {
+          const brochureUrl = `${import.meta.env.VITE_IMAGE_URL || 'http://localhost:5000'}${result.data.url}`;
           setFormData(prev => ({
             ...prev,
             brochure: {
-              url: result.data.url,
+              url: brochureUrl,
               publicId: result.data.publicId,
               filename: result.data.originalName || actualFile.name
             }
@@ -776,7 +778,9 @@ const ProjectForm = ({
                 <div className="file-info">
                   <span className="file-icon">📄</span>
                   <div className="file-details">
+                    <a href={formData.brochure.url} target="_blank" rel="noopener noreferrer" className="file-name-link">
                     <p className="file-name">{formData.brochure.filename || 'Project Brochure'}</p>
+                  </a>
                     <p className="file-url">Uploaded: {formData.brochure.url}</p>
                   </div>
                 </div>

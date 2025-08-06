@@ -17,7 +17,11 @@ const About = () => {
     threshold: 0.1,
     triggerOnce: true
   });
-
+  const getFullImageUrl = (url) => {
+    if (!url) return '';
+    if (url.startsWith('http') || url.startsWith('blob:')) return url;
+    return `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${url}`;
+  };
   // Fetch team members from API
   const { data: teamMembers, isLoading: teamLoading, error: teamError } = useGetTeamMembersQuery();
 
@@ -263,7 +267,7 @@ const About = () => {
                 >
                   <div className="member-image">
                     <img
-                      src={member.image?.url || member.image}
+                      src={getFullImageUrl(member.image?.url || member.image)}
                       alt={member.image?.alt || member.name}
                       onError={(e) => {
                         e.target.src = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face";

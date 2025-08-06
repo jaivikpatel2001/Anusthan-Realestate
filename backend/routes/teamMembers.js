@@ -28,19 +28,8 @@ const createTeamMemberValidation = [
     .withMessage('Description is required')
     .isLength({ max: 500 })
     .withMessage('Description cannot exceed 500 characters'),
-  body('image.url')
-    .notEmpty()
-    .withMessage('Image URL is required')
-    .isURL()
-    .withMessage('Image URL must be valid'),
-  body('email')
-    .optional()
-    .isEmail()
-    .withMessage('Please provide a valid email'),
-  body('phone')
-    .optional()
-    .matches(/^[6-9]\d{9}$/)
-    .withMessage('Please provide a valid 10-digit Indian mobile number'),
+ 
+  
   handleValidationErrors
 ];
 

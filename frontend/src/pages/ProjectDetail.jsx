@@ -109,13 +109,16 @@ const ProjectDetail = () => {
       return;
     }
 
+    // Show loading state
+    const loadingToast = showSuccess('Processing your request...', { autoClose: false });
+
     try {
-      // Submit lead data to backend
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/leads/brochure-download`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/leads/brochure`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
           name: brochureFormData.name,
           email: brochureFormData.email,
@@ -127,20 +130,38 @@ const ProjectDetail = () => {
       const result = await response.json();
 
       if (response.ok && result.success) {
-        // Close form and download brochure
+        // Close form and reset
         setShowBrochureForm(false);
         setBrochureFormData({ name: '', email: '', mobile: '' });
 
-        // Trigger download using the URL from the response
-        await downloadPDF(result.data.brochureUrl, `${result.data.projectTitle}-Brochure.pdf`, showError);
+        // Close loading toast
+        if (loadingToast && typeof loadingToast.close === 'function') {
+          loadingToast.close();
+        }
 
-        showSuccess(result.message || 'Thank you! Your brochure download will start shortly.');
+        // Trigger download with enhanced error handling
+        try {
+          await downloadPDF(
+            result.data.brochureUrl, 
+            `${result.data.projectTitle}-Brochure.pdf`, 
+            showError
+          );
+          showSuccess('Brochure download started!');
+        } catch (downloadError) {
+          console.error('Download error:', downloadError);
+          showError('Failed to start download. Please try again.');
+        }
       } else {
         throw new Error(result.message || 'Failed to submit form');
       }
     } catch (error) {
       console.error('Brochure form submission error:', error);
-      showError('Failed to submit form. Please try again.');
+      showError(error.message || 'Failed to submit form. Please try again.');
+
+      // Close loading toast on error
+      if (loadingToast && typeof loadingToast.close === 'function') {
+        loadingToast.close();
+      }
     }
   };
 

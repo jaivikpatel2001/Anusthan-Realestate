@@ -16,7 +16,8 @@ const CompletedProjects = () => {
   const [activeFilter, setActiveFilter] = useState('all');
 
   // Fetch completed projects from API
-  const { data: completedProjects = [], isLoading, error } = useGetProjectsByStatusQuery('completed');
+  const { data: completedProjectsData, isLoading, error } = useGetProjectsByStatusQuery('completed');
+  const completedProjects = completedProjectsData?.projects || [];
 
   const handleFilterChange = (filterId) => {
     setActiveFilter(filterId);
