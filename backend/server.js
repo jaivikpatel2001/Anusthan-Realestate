@@ -82,6 +82,7 @@ app.use('/api/team-members', require('./routes/teamMembers'));
 app.use('/api/milestones', require('./routes/milestones'));
 app.use('/api/statistics', require('./routes/statistics'));
 app.use('/api/addresses', require('./routes/addresses'));
+app.use('/api/contact', require('./routes/contact'));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

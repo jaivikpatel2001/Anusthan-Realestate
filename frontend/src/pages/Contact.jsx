@@ -84,11 +84,13 @@ const Contact = () => {
     }
 
     try {
-      await createLead({
-        ...formData,
-        leadType: 'contact_inquiry',
-        source: 'website'
-      }).unwrap();
+      await fetch('http://localhost:5000/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
 
       showSuccess('Thank you for your message! We will get back to you soon.');
       setFormData({
