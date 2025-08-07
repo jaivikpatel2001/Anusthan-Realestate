@@ -324,6 +324,61 @@ const SettingsForm = ({
           placeholder="sales@company.com"
         />
       </div>
+      <div className="form-section">
+        <h4>Address</h4>
+        <FormField
+          label="Street Address"
+          name="address.street"
+          value={formData.address?.street}
+          onChange={handleInputChange}
+          error={errors['address.street']}
+          placeholder="123 Main Street"
+        />
+        <div className="form-row">
+          <div className="form-col">
+            <FormField
+              label="City"
+              name="address.city"
+              value={formData.address?.city}
+              onChange={handleInputChange}
+              error={errors['address.city']}
+              placeholder="City"
+            />
+          </div>
+          <div className="form-col">
+            <FormField
+              label="State/Province"
+              name="address.state"
+              value={formData.address?.state}
+              onChange={handleInputChange}
+              error={errors['address.state']}
+              placeholder="State"
+            />
+          </div>
+        </div>
+        <div className="form-row">
+          <div className="form-col">
+            <FormField
+              label="Postal/Zip Code"
+              name="address.zipCode"
+              value={formData.address?.zipCode}
+              onChange={handleInputChange}
+              error={errors['address.zipCode']}
+              placeholder="123456"
+            />
+          </div>
+          <div className="form-col">
+            <FormField
+              label="Country"
+              name="address.country"
+              value={formData.address?.country}
+              onChange={handleInputChange}
+              error={errors['address.country']}
+              placeholder="Country"
+            />
+          </div>
+        </div>
+      </div>
     </>
   );
 
@@ -622,6 +677,61 @@ const SettingsForm = ({
           onChange={handleInputChange}
           error={errors['mailchimp.isEnabled']}
         />
+      </div>
+      <div className="form-section">
+        <h4>Address</h4>
+        <FormField
+          label="Street Address"
+          name="address.street"
+          value={formData.address?.street}
+          onChange={handleInputChange}
+          error={errors['address.street']}
+          placeholder="123 Main Street"
+        />
+        <div className="form-row">
+          <div className="form-col">
+            <FormField
+              label="City"
+              name="address.city"
+              value={formData.address?.city}
+              onChange={handleInputChange}
+              error={errors['address.city']}
+              placeholder="City"
+            />
+          </div>
+          <div className="form-col">
+            <FormField
+              label="State/Province"
+              name="address.state"
+              value={formData.address?.state}
+              onChange={handleInputChange}
+              error={errors['address.state']}
+              placeholder="State"
+            />
+          </div>
+        </div>
+        <div className="form-row">
+          <div className="form-col">
+            <FormField
+              label="Postal/Zip Code"
+              name="address.zipCode"
+              value={formData.address?.zipCode}
+              onChange={handleInputChange}
+              error={errors['address.zipCode']}
+              placeholder="123456"
+            />
+          </div>
+          <div className="form-col">
+            <FormField
+              label="Country"
+              name="address.country"
+              value={formData.address?.country}
+              onChange={handleInputChange}
+              error={errors['address.country']}
+              placeholder="Country"
+            />
+          </div>
+        </div>
       </div>
     </>
   );

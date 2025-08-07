@@ -314,37 +314,61 @@
 }
 
 /* Responsive Design */
+.mobile-nav-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: var(--space-2);
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  z-index: 1001;
+}
+
 @media (max-width: 768px) {
   .admin-sidebar {
-    width: 100%;
-    position: relative;
-    height: auto;
+    position: fixed;
+    left: -280px;
+    top: 0;
+    height: 100%;
+    z-index: 1000;
+    transition: left 0.3s ease-in-out;
+  }
+
+  .admin-dashboard.sidebar-open .admin-sidebar {
+    left: 0;
   }
 
   .admin-main {
     margin-left: 0;
   }
 
-  .stats-grid {
-    grid-template-columns: 1fr;
+  .mobile-nav-toggle {
+    display: block;
   }
 
-  .section-header {
-    flex-direction: column;
-    gap: var(--space-4);
-    align-items: stretch;
-  }
-
-  .projects-table {
-    overflow-x: auto;
-  }
-
-  .projects-table table {
-    min-width: 600px;
+  .admin-header {
+    position: relative;
   }
 }
 
-/* File Upload Styles */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+@media (min-width: 769px) {
+  .overlay {
+    display: none;
+  }
+}
 .file-field-container {
   width: 100%;
 }

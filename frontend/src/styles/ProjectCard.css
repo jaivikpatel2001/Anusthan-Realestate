@@ -50,7 +50,6 @@
   backdrop-filter: blur(10px);
 }
 .status-badgefortable {
-  position: absolute;
   
   padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-full);

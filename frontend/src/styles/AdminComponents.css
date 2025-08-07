@@ -852,7 +852,6 @@
 
 /* Project Management Styles */
 .project-management {
-  max-width: 1400px;
 }
 
 .management-header {
@@ -1407,58 +1406,6 @@
   z-index: 1;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .management-header {
-    flex-direction: column;
-    gap: var(--space-4);
-    align-items: stretch;
-  }
-
-  .management-filters {
-    flex-direction: column;
-    gap: var(--space-4);
-  }
-
-  .filter-group {
-    flex-direction: column;
-  }
-
-  .form-row {
-    grid-template-columns: 1fr;
-  }
-
-  .form-actions {
-    flex-direction: column;
-  }
-
-  .array-input-row {
-    flex-direction: column;
-  }
-
-  .management-header {
-    flex-direction: column;
-    gap: var(--space-4);
-    align-items: stretch;
-    text-align: center;
-  }
-
-  .management-filters {
-    flex-direction: column;
-    gap: var(--space-4);
-  }
-
-  .filter-group {
-    flex-direction: column;
-    gap: var(--space-3);
-  }
-
-  .export-btn {
-    width: 100%;
-    justify-content: center;
-  }
-}
-
 /* Apartment Management Styles */
 .apartment-management {
   max-width: 1400px;
@@ -1896,6 +1843,70 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .form-input {
+    padding: var(--space-2);
+    font-size: var(--text-sm);
+  }
+
+  .modal-body {
+    padding: var(--space-4);
+  }
+
+  .data-table-table th,
+  .data-table-table td {
+    padding: var(--space-2);
+    font-size: var(--text-xs);
+  }
+
+  .management-header {
+    flex-direction: column;
+    gap: var(--space-4);
+    align-items: stretch;
+  }
+
+  .management-filters {
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .filter-group {
+    flex-direction: column;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .array-input-row {
+    flex-direction: column;
+  }
+
+  .management-header {
+    flex-direction: column;
+    gap: var(--space-4);
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .management-filters {
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .filter-group {
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .export-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
   .settings-grid {
     grid-template-columns: 1fr;
   }

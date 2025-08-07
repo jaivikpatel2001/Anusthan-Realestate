@@ -7,11 +7,12 @@ import {
   FiFolder,
   FiUsers,
   FiSettings,
-  FiLogOut
+  FiLogOut,
+  FiMenu,
+  FiX,
 } from 'react-icons/fi';
 import { RiTeamFill } from 'react-icons/ri';
 import { MdTimeline } from 'react-icons/md';
-import { FiBarChart } from 'react-icons/fi';
 import { selectIsAuthenticated, selectIsAdmin, selectCurrentUser } from '../store/slices/authSlice';
 import { logout } from '../store/slices/authSlice';
 import { useLogoutMutation } from '../store/api/authApi';
@@ -32,6 +33,7 @@ import StatisticsManagement from '../components/admin/StatisticsManagement';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -46,7 +48,6 @@ const AdminDashboard = () => {
 
   const projects = projectsData?.projects || [];
 
-  // Redirect if not authenticated or not admin
   useEffect(() => {
     if (!isAuthenticated || !isAdmin) {
       navigate('/admin', { replace: true });
@@ -68,11 +69,9 @@ const AdminDashboard = () => {
   const menuItems = [
     { id: 'overview', label: 'Overview', icon: FiHome },
     { id: 'projects', label: 'Projects', icon: FiFolder },
-    { id: 'apartments', label: 'Apartments', icon: BiBuilding },
     { id: 'leads', label: 'Leads', icon: FiUsers },
     { id: 'team', label: 'Team Members', icon: RiTeamFill },
     { id: 'milestones', label: 'Company Journey', icon: MdTimeline },
-    { id: 'statistics', label: 'Site Statistics', icon: FiBarChart },
     { id: 'settings', label: 'Settings', icon: FiSettings },
   ];
 
@@ -81,9 +80,9 @@ const AdminDashboard = () => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1
-      }
-    }
+        staggerChildren: 0.1,
+      },
+    },
   };
 
   const itemVariants = {
@@ -91,8 +90,8 @@ const AdminDashboard = () => {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.5 }
-    }
+      transition: { duration: 0.5 },
+    },
   };
 
   if (!isAuthenticated || !isAdmin) {
@@ -100,14 +99,13 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="admin-dashboard">
+    <div className={`admin-dashboard ${isSidebarOpen ? 'sidebar-open' : ''}`}>
       <SEOHead
         title="Admin Dashboard - Elite Estate"
         description="Admin dashboard for managing Elite Estate projects, apartments, and leads"
         keywords={['admin', 'dashboard', 'management', 'projects']}
       />
 
-      {/* Sidebar */}
       <aside className="admin-sidebar">
         <div className="sidebar-header">
           <h2>Admin Panel</h2>
@@ -119,7 +117,10 @@ const AdminDashboard = () => {
             <button
               key={item.id}
               className={`nav-item ${activeTab === item.id ? 'active' : ''}`}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => {
+                setActiveTab(item.id);
+                setIsSidebarOpen(false);
+              }}
             >
               <item.icon size={20} />
               <span>{item.label}</span>
@@ -135,13 +136,17 @@ const AdminDashboard = () => {
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="admin-main">
         <div className="admin-header">
+          <button className="mobile-nav-toggle" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+            {isSidebarOpen ? <FiX /> : <FiMenu />}
+          </button>
           <h1>
-            {menuItems.find(item => item.id === activeTab)?.label || 'Dashboard'}
+            {menuItems.find((item) => item.id === activeTab)?.label || 'Dashboard'}
           </h1>
         </div>
+
+        {isSidebarOpen && <div className="overlay" onClick={() => setIsSidebarOpen(false)}></div>}
 
         <div className="admin-content">
           {activeTab === 'overview' && (
@@ -167,7 +172,7 @@ const AdminDashboard = () => {
                     <BiBuilding />
                   </div>
                   <div className="stat-info">
-                    <h3>{projects.filter(p => p.status === 'ongoing').length}</h3>
+                    <h3>{projects.filter((p) => p.status === 'ongoing').length}</h3>
                     <p>Ongoing Projects</p>
                   </div>
                 </motion.div>
@@ -177,7 +182,7 @@ const AdminDashboard = () => {
                     <FiUsers />
                   </div>
                   <div className="stat-info">
-                    <h3>{projects.filter(p => p.status === 'completed').length}</h3>
+                    <h3>{projects.filter((p) => p.status === 'completed').length}</h3>
                     <p>Completed Projects</p>
                   </div>
                 </motion.div>
