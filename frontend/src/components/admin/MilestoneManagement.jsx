@@ -42,7 +42,6 @@ const MilestoneManagement = () => {
   const [createMilestone, { isLoading: createLoading }] = useCreateMilestoneMutation();
   const [updateMilestone, { isLoading: updateLoading }] = useUpdateMilestoneMutation();
   const [deleteMilestone, { isLoading: deleteLoading }] = useDeleteMilestoneMutation();
-  const [toggleActive, { isLoading: toggleLoading }] = useToggleMilestoneActiveMutation();
 
   const milestones = milestonesData?.milestones || [];
   const pagination = milestonesData?.pagination || {};
@@ -85,16 +84,7 @@ const MilestoneManagement = () => {
     }
   };
 
-  // Handle toggle active status
-  const handleToggleActive = async (milestone) => {
-    try {
-      await toggleActive(milestone._id).unwrap();
-      showSuccess(`Milestone ${milestone.isActive ? 'deactivated' : 'activated'} successfully`);
-      refetchMilestones();
-    } catch (error) {
-      showError(error?.data?.message || 'Failed to update milestone status');
-    }
-  };
+
 
   // Generate year options for filter
   const currentYear = new Date().getFullYear();
@@ -130,15 +120,7 @@ const MilestoneManagement = () => {
         </span>
       )
     },
-    {
-      key: 'isActive',
-      label: 'Status',
-      render: (milestone) => (
-        <span className={`status-badge ${milestone.isActive ? 'active' : 'inactive'}`}>
-          {milestone.isActive ? 'Active' : 'Inactive'}
-        </span>
-      )
-    },
+
     {
       key: 'createdAt',
       label: 'Created',
@@ -166,15 +148,7 @@ const MilestoneManagement = () => {
         setShowDeleteDialog(true);
       }
     },
-    {
-      icon: milestone => milestone.isActive ?
-        <FiEyeOff className="action-icon" title="Deactivate" /> :
-        <FiEye className="action-icon" title="Activate" />,
-      title: 'Toggle Status',
-      className: 'status-action danger', // add 'danger' class if desired
-      onClick: (milestone) => handleToggleActive(milestone),
-      loading: toggleLoading
-    }
+
   ];
 
 // Bulk actions

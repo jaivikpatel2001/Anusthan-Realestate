@@ -690,4 +690,32 @@ router.patch('/:id/follow-up', protect, adminOnly, async (req, res) => {
   }
 });
 
+// @desc    Delete a lead
+// @route   DELETE /api/leads/:id
+// @access  Private/Admin
+router.delete('/:id', protect, adminOnly, async (req, res) => {
+  try {
+    const lead = await Lead.findByIdAndDelete(req.params.id);
+
+    if (!lead) {
+      return res.status(404).json({
+        success: false,
+        message: 'Lead not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Lead deleted successfully'
+    });
+  } catch (error) {
+    console.error('Delete lead error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete lead',
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;

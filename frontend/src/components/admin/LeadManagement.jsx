@@ -52,7 +52,7 @@ const LeadManagement = () => {
 
   const leads = leadsData?.leads || [];
   const projects = projectsData?.projects || [];
-
+  
   // Handle create lead
   const handleCreateLead = async (leadData) => {
     try {
@@ -163,7 +163,7 @@ const LeadManagement = () => {
       key: 'status',
       title: 'Status',
       render: (value) => (
-        <span className={`status-badge ${value}`}>
+        <span className={`status-badgelead ${value}`}>
           {value?.replace('_', ' ').toUpperCase() || 'NEW'}
         </span>
       )
@@ -270,13 +270,10 @@ const LeadManagement = () => {
     { value: 'new', label: 'New' },
     { value: 'contacted', label: 'Contacted' },
     { value: 'qualified', label: 'Qualified' },
-    { value: 'proposal_sent', label: 'Proposal Sent' },
-    { value: 'negotiation', label: 'Negotiation' },
-    { value: 'booking', label: 'Booking' },
-    { value: 'closed_won', label: 'Closed Won' },
-    { value: 'closed_lost', label: 'Closed Lost' },
-    { value: 'follow_up', label: 'Follow Up' },
-    { value: 'not_interested', label: 'Not Interested' }
+    { value: 'interested', label: 'Interested' },
+    { value: 'not_interested', label: 'Not Interested' },
+    { value: 'converted', label: 'Converted' },
+    { value: 'lost', label: 'Lost' }
   ];
 
   const priorityOptions = [

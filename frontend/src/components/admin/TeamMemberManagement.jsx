@@ -128,15 +128,6 @@ const TeamMemberManagement = () => {
       render: (member) => `${member.experienceYears}+ years`
     },
     {
-      key: 'isActive',
-      label: 'Status',
-      render: (member) => (
-        <span className={`status-badge ${member.isActive ? 'active' : 'inactive'}`}>
-          {member.isActive ? 'Active' : 'Inactive'}
-        </span>
-      )
-    },
-    {
       key: 'createdAt',
       label: 'Created',
       render: (member) => new Date(member.createdAt).toLocaleDateString()
@@ -153,20 +144,13 @@ const TeamMemberManagement = () => {
         setShowEditModal(true);
       }
     },
-    {
-      label: (member) => member.isActive ? 'Deactivate' : 'Activate',
-      icon: (member) => member.isActive ? FiEyeOff : FiEye,
-      onClick: handleToggleActive,
-      loading: toggleLoading
-    },
     { className:'delete',
       label: 'Delete',
       icon: <FiTrash2/>,
       onClick: (member) => {
         setSelectedMember(member);
         setShowDeleteDialog(true);
-      },
-      
+      }
     }
   ];
 
