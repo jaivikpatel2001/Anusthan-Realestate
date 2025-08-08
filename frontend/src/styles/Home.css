@@ -5,7 +5,7 @@
 
 /* Projects Sections */
 .projects-section {
-  padding: var(--space-20) 0;
+  padding: var(--space-10) 0;
   position: relative;
   overflow: hidden;
   max-width: 100%;
@@ -65,7 +65,7 @@
   font-size: clamp(2.5rem, 5vw, 3.5rem);
   font-weight: 800;
   color: var(--text-primary);
-  margin-bottom: var(--space-4);
+  
   line-height: 1.2;
 }
 
@@ -90,6 +90,7 @@
   grid-template-columns: repeat(3, 1fr);
   gap: var(--space-8);
   margin-bottom: var(--space-12);
+  margin-top: var(--space-12);
   max-width: 1400px;
   margin-left: auto;
   margin-right: auto;

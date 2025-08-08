@@ -409,9 +409,7 @@ const ProjectDetail = () => {
                 <div className="amenities-grid">
                   {project.amenities.map((amenity, index) => (
                     <div key={index} className="amenity-item">
-                      <div className="amenity-icon">
-                        {amenity.icon || '🏠'}
-                      </div>
+                      
                       <div>
                         <h4>{amenity.name}</h4>
                         {amenity.description && (

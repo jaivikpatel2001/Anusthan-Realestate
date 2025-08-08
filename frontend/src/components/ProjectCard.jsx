@@ -1,9 +1,10 @@
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { FiMapPin, FiHome, FiCalendar, FiTrendingUp } from 'react-icons/fi';
 import '../styles/ProjectCard.css';
 
 const ProjectCard = ({ project, index, inView, onClick, showViewDetails = false }) => {
+  const navigate = useNavigate();
   const isOngoing = project.status === 'ongoing';
   const isUpcoming = project.status === 'upcoming';
   const isCompleted = project.status === 'completed';
@@ -55,7 +56,16 @@ const ProjectCard = ({ project, index, inView, onClick, showViewDetails = false 
     return 'TBD';
   };
 
-  console.log("project.heroImage",project.heroImage || project.images?.[0]?.url || '/placeholder-project.jpg') 
+  const handleCardClick = () => {
+    if (onClick) {
+      onClick();
+    } else {
+      // Navigate to project detail page
+      navigate(`/projects/${project._id || project.slug}`);
+    }
+  };
+
+  console.log("project.heroImage",project.heroImage || project.images?.[0]?.url || '/placeholder-project.jpg')
 
   return (
     <motion.div
@@ -67,8 +77,8 @@ const ProjectCard = ({ project, index, inView, onClick, showViewDetails = false 
         y: -8,
         transition: { duration: 0.3 }
       }}
-      onClick={onClick}
-      style={onClick ? { cursor: 'pointer' } : {}}
+      onClick={handleCardClick}
+      style={{ cursor: 'pointer' }}
     >
       <div className="card-image">
         <img
@@ -141,7 +151,7 @@ const ProjectCard = ({ project, index, inView, onClick, showViewDetails = false 
         </div>
 
         <p className="project-description">
-          {project.shortDescription || project.description?.substring(0, 120) + '...'}
+          {project.shortDescription || project.description}
         </p>
 
         <div className="project-details">
@@ -175,18 +185,7 @@ const ProjectCard = ({ project, index, inView, onClick, showViewDetails = false 
           </div>
         </div>
 
-        {/* Action Button */}
-        {showViewDetails && (
-          <div className="card-actions">
-            <Link
-              to={`/projects/${project._id || project.slug}`}
-              className="view-details-btn"
-              onClick={(e) => e.stopPropagation()}
-            >
-              View Details
-            </Link>
-          </div>
-        )}
+
       </div>
     </motion.div>
   );

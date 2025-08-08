@@ -1087,7 +1087,7 @@
 .amenity-item {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
+  
   padding: var(--space-3);
   background: var(--glass-bg);
   border: 1px solid var(--border-primary);

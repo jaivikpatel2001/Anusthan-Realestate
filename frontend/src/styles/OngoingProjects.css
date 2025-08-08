@@ -28,7 +28,7 @@
 .section-title {
   font-size: var(--text-5xl);
   font-weight: 700;
-  margin-bottom: var(--space-4);
+
   color: var(--text-primary);
 }
 

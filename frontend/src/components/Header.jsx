@@ -25,7 +25,7 @@ const Header = () => {
     { name: 'Projects', href: '/projects' },
     { name: 'Completed', href: '/completed' },
     { name: 'About', href: '/about' },
-    { name: 'Contact', href: '/contact' }
+    
   ];
 
   const toggleMenu = () => {
@@ -103,7 +103,7 @@ const Header = () => {
             transition={{ delay: 0.8 }}
           >
             <Link to="/contact" className="btn btn-primary">
-              Get Quote
+              CONTACT US
             </Link>
           </motion.div>
 

@@ -133,7 +133,7 @@
   font-weight: 700;
   color: var(--text-primary);
   text-align: center;
-  margin-bottom: var(--space-16);
+ 
   background: var(--accent-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
