@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Lockfiles
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
 # Uploads directory
 /uploads
 .env
