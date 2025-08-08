@@ -720,6 +720,14 @@ const ProjectForm = ({
                   className="image-preview"
                 />
                 <p className="image-url">Uploaded: {formData.heroImage}</p>
+                <button
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, heroImage: '' }))}
+                  className="remove-image-btn"
+                  title="Remove hero image"
+                >
+                  ×
+                </button>
               </div>
             )}
           </div>

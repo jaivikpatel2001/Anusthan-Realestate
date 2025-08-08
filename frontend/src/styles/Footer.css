@@ -68,7 +68,7 @@
 }
 
 .logo__text {
-  color: var(--text-primary);
+  color: var(--accent-primary);
   margin-right: var(--space-1);
 }
 

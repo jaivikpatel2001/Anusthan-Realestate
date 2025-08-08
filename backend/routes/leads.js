@@ -48,10 +48,14 @@ router.post('/', validateLead.create, async (req, res) => {
 
       await existingLead.save();
 
+      const populatedLead = await Lead.findById(existingLead._id)
+        .populate('projectId', 'title location')
+        .populate('apartmentId', 'type bedrooms bathrooms');
+
       return res.json({
         success: true,
         message: 'Lead information updated successfully',
-        data: { lead: existingLead }
+        data: { lead: populatedLead }
       });
     }
 
@@ -146,6 +150,10 @@ router.post('/brochure-download', validateLead.create, async (req, res) => {
       await lead.save();
     }
 
+    const populated = await Lead.findById(lead._id)
+      .populate('projectId', 'title location')
+      .populate('apartmentId', 'type bedrooms bathrooms');
+
     res.json({
       success: true,
       message: 'Lead captured successfully. Brochure download will start shortly.',
@@ -153,6 +161,7 @@ router.post('/brochure-download', validateLead.create, async (req, res) => {
         brochureUrl: project.brochure.url,
         projectTitle: project.title,
         leadId: lead._id,
+        lead: populated,
         brochureSize: project.brochure.size || null,
         brochureFilename: project.brochure.filename || `${project.title}-Brochure.pdf`
       }

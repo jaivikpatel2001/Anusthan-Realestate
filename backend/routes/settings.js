@@ -26,7 +26,8 @@ router.get('/', async (req, res) => {
       theme: settings.theme,
       integrations: {
         googleMaps: {
-          isEnabled: settings.integrations.googleMaps.isEnabled
+          isEnabled: settings.integrations.googleMaps.isEnabled,
+          apiKey: settings.integrations.googleMaps.apiKey
         },
         whatsapp: {
           businessNumber: settings.integrations.whatsapp.businessNumber,

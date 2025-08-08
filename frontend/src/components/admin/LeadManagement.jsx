@@ -34,14 +34,18 @@ const LeadManagement = () => {
     data: leadsData, 
     isLoading: leadsLoading, 
     refetch: refetchLeads 
-  } = useGetLeadsQuery({
-    search: searchTerm,
-    projectId: projectFilter,
-    status: statusFilter,
-    priority: priorityFilter,
-    source: sourceFilter,
-    limit: 100
-  });
+  } = useGetLeadsQuery(
+    {
+      search: searchTerm,
+      projectId: projectFilter,
+      status: statusFilter,
+      priority: priorityFilter,
+      source: sourceFilter,
+      limit: 100,
+      sort: '-updatedAt'
+    },
+    { refetchOnFocus: true, refetchOnReconnect: true, pollingInterval: 15000 }
+  );
 
   const { data: projectsData } = useGetProjectsQuery({ limit: 100 });
 
@@ -311,13 +315,22 @@ const LeadManagement = () => {
           <p>Manage and track all your leads</p>
         </div>
         
-        <button
-          className="btn btn-primary"
-          onClick={() => setShowCreateModal(true)}
-        >
-          <FiPlus size={18} />
-          Add New Lead
-        </button>
+        <div className="header-actions" style={{ display: 'flex', gap: '8px' }}>
+          <button
+            className="btn btn-secondary"
+            onClick={() => refetchLeads()}
+            disabled={leadsLoading}
+          >
+            Refresh
+          </button>
+          <button
+            className="btn btn-primary"
+            onClick={() => setShowCreateModal(true)}
+          >
+            <FiPlus size={18} />
+            Add New Lead
+          </button>
+        </div>
       </div>
 
       <div className="management-filters">

@@ -20,6 +20,7 @@ const Contact = () => {
     companyName,
     contact,
     businessHours,
+    integrations,
     getFormattedAddress,
     getGoogleMapsUrl,
     getWhatsAppUrl,
@@ -114,6 +115,7 @@ const Contact = () => {
       }
     }
   };
+  console.log(integrations);
 
   const itemVariants = {
     hidden: { opacity: 0, y: 30 },
@@ -215,11 +217,46 @@ const Contact = () => {
                     <div className="method-details">
                       <h4>Address</h4>
                       <p>{getFormattedAddress()}</p>
-                      {getGoogleMapsUrl() && (
-                        <a href={getGoogleMapsUrl()} target="_blank" rel="noopener noreferrer">
-                          View on Google Maps
-                        </a>
-                      )}
+                      
+                    </div>
+                  </div>
+                )}
+
+                {/* Business Hours */}
+                {businessHours && (
+                  <div className="contact-method">
+                    <div className="method-icon">
+                      <FiClock />
+                    </div>
+                    <div className="method-details">
+                      <h4>Business Hours</h4>
+                      <div className="business-hours">
+                        <div className="hours-row">
+                          <span>Mon - Fri - </span>
+                          <span>
+                            {businessHours.weekdays?.isOpen
+                              ? `${businessHours.weekdays.openTime} - ${businessHours.weekdays.closeTime}`
+                              : 'Closed'}
+                          </span>
+                        </div>
+                        <div className="hours-row">
+                          <span>Saturday - </span>
+                          <span>
+                            {businessHours.saturday?.isOpen
+                              ? `${businessHours.saturday.openTime} - ${businessHours.saturday.closeTime}`
+                              : 'Closed'}
+                          </span>
+                        </div>
+                        <div className="hours-row">
+                          <span>Sunday - </span>
+                          <span>
+                            {businessHours.sunday?.isOpen
+                              ? `${businessHours.sunday.openTime} - ${businessHours.sunday.closeTime}`
+                              : 'Closed'}
+                          </span>
+                        </div>
+                      </div>
+                      
                     </div>
                   </div>
                 )}
@@ -332,8 +369,34 @@ const Contact = () => {
               </form>
             </motion.div>
           </motion.div>
+          
+          {/* Google Maps Embed */}
+          {Boolean(integrations?.googleMaps?.apiKey) && (
+            <motion.div className="contact-map" variants={itemVariants}>
+              <h2>Our Location</h2>
+              {String(integrations.googleMaps.apiKey).includes('<iframe') ? (
+                <div
+                  className="map-embed"
+                  dangerouslySetInnerHTML={{ __html: integrations.googleMaps.apiKey }}
+                />
+              ) : (
+                <iframe
+                  src={integrations.googleMaps.apiKey}
+                  width="100%"
+                  height="400"
+                  style={{ border: 0 }}
+                  allowFullScreen=""
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Google Maps"
+                />
+              )}
+            </motion.div>
+          )}
+
         </div>
       </section>
+      
     </div>
   );
 };

@@ -77,11 +77,13 @@ export const useSettings = () => {
 
   // Utility functions
   const getBusinessHoursForDay = (day) => {
-    return businessHours[day.toLowerCase()] || { isOpen: false, openTime: '09:00', closeTime: '18:00' };
+    const d = day.toLowerCase();
+    const group = d === 'saturday' ? 'saturday' : d === 'sunday' ? 'sunday' : 'weekdays';
+    return businessHours[group] || { isOpen: false, openTime: '09:00', closeTime: '18:00' };
   };
 
   const isBusinessOpen = (day = null, time = null) => {
-    const currentDay = day || new Date().toLocaleDateString('en-US', { weekday: 'lowercase' });
+    const currentDay = (day || new Date().toLocaleDateString('en-US', { weekday: 'long' })).toLowerCase();
     const currentTime = time || new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
     
     const dayHours = getBusinessHoursForDay(currentDay);

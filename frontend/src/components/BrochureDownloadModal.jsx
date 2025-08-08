@@ -60,6 +60,13 @@ const BrochureDownloadModal = () => {
       return;
     }
 
+    // Sanitize mobile to digits only
+    const mobileClean = String(formData.mobile || '').replace(/[^\d]/g, '');
+    if (!/^[6-9]\d{9}$/.test(mobileClean)) {
+      setErrors(prev => ({ ...prev, mobile: 'Please enter a valid 10-digit mobile number' }));
+      return;
+    }
+
     // Show loading state
     const loadingToast = showSuccess('Processing your request...', { autoClose: false });
     
@@ -69,7 +76,7 @@ const BrochureDownloadModal = () => {
         projectId: modal.projectId,
         name: formData.name,
         email: formData.email,
-        phone: formData.mobile, // Backend expects 'phone' not 'mobile'
+        mobile: mobileClean,
         source: 'website',
         leadType: 'brochure_download'
       };
@@ -95,7 +102,7 @@ const BrochureDownloadModal = () => {
           // Ensure we have a proper URL (handle both relative and absolute)
           const fullBrochureUrl = brochureUrl.startsWith('http') 
             ? brochureUrl 
-            : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${brochureUrl}`;
+            : `${import.meta.env.VITE_IMAGE_URL || 'http://localhost:5000'}${brochureUrl.startsWith('/') ? '' : '/'}${brochureUrl}`;
             
           console.log('Attempting to download from URL:', fullBrochureUrl);
           
@@ -126,10 +133,10 @@ const BrochureDownloadModal = () => {
       }
       
       // Show more detailed error message
-      const errorMessage = error?.data?.message || 
-                         error?.error || 
-                         error?.message || 
-                         'Failed to process your request. Please try again.';
+      const validationMsgs = Array.isArray(error?.data?.errors)
+        ? error.data.errors.map(e => e.message).join(' | ')
+        : null;
+      const errorMessage = validationMsgs || error?.data?.message || error?.error || error?.message || 'Failed to process your request. Please try again.';
       
       console.error('Full error details:', error);
       showError(errorMessage);

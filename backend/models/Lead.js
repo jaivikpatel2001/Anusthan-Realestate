@@ -190,18 +190,18 @@ leadSchema.pre('save', function(next) {
 });
 
 // Update project lead count after lead creation
-leadSchema.post('save', async function() {
-  if (this.isNew) {
-    try {
-      const Project = mongoose.model('Project');
-      const project = await Project.findById(this.projectId);
-      if (project) {
-        await project.incrementLeadCount();
-      }
-    } catch (error) {
-      console.error('Error updating project lead count:', error);
+leadSchema.post('save', async function(doc, next) {
+  try {
+    const Project = mongoose.model('Project');
+    const project = await Project.findById(doc.projectId);
+    
+    if (project) {
+      await project.incrementLeadCount();
     }
+  } catch (error) {
+    console.error(`Error in post-save hook for lead ${doc._id}:`, error);
   }
+  next();
 });
 
 // Method to add contact history

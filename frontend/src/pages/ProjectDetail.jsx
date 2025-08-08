@@ -112,73 +112,47 @@ const ProjectDetail = () => {
       return;
     }
 
-    // Show loading state
+    const mobileClean = String(brochureFormData.mobile || '').replace(/[^\d]/g, '');
+    if (!/^[6-9]\d{9}$/.test(mobileClean)) {
+      showError('Please enter a valid 10-digit mobile number');
+      return;
+    }
+
     const loadingToast = showSuccess('Processing your request...', { autoClose: false });
 
     try {
-      // First, submit the lead information
-      await downloadBrochure({
+      console.log('Submitting brochure form with data:', { ...brochureFormData, mobile: mobileClean, projectId: project._id });
+
+      const response = await downloadBrochure({
         name: brochureFormData.name,
         email: brochureFormData.email,
-        mobile: brochureFormData.mobile,
+        mobile: mobileClean,
         projectId: project._id
       }).unwrap();
 
-      // Close form and reset
-      setShowBrochureForm(false);
-      setBrochureFormData({ name: '', email: '', mobile: '' });
+      console.log('API response received:', response);
 
       // Close loading toast
       if (loadingToast && typeof loadingToast.close === 'function') {
         loadingToast.close();
       }
 
-      // Get the brochure URL - handle both string and object formats
-      let brochureUrl = '';
-      
-      // If brochure is an object, try to get the URL from common property names
-      if (project.brochure && typeof project.brochure === 'object') {
-        brochureUrl = project.brochure.url || project.brochure.path || project.brochure.link || '';
-      } 
-      // If brochure is a string
-      else if (typeof project.brochure === 'string') {
-        brochureUrl = project.brochure;
+      setShowBrochureForm(false);
+      setBrochureFormData({ name: '', email: '', mobile: '' });
+
+      const brochureUrl = response?.brochureUrl;
+      const projectTitle = response?.projectTitle || project.title;
+
+      if (brochureUrl) {
+        await downloadPDF(brochureUrl, `${projectTitle}-brochure.pdf`, showError);
+        showSuccess('Brochure download started!');
+      } else {
+        throw new Error('Brochure URL not found in the API response.');
       }
-      // Try brochureUrl as fallback
-      else if (project.brochureUrl) {
-        brochureUrl = typeof project.brochureUrl === 'string' ? project.brochureUrl : '';
-      }
-      
-      if (!brochureUrl) {
-        throw new Error('Brochure URL not found');
-      }
-      
-      // Ensure it's a string
-      brochureUrl = String(brochureUrl).trim();
-      
-      // If it's a relative URL, make it absolute
-      if (!brochureUrl.startsWith('http')) {
-        const baseUrl = import.meta.env.VITE_IMAGE_URL || 'http://localhost:5000';
-        // Remove any leading slashes to prevent double slashes when joining
-        brochureUrl = `${baseUrl}${brochureUrl.startsWith('/') ? '' : '/'}${brochureUrl.replace(/^\/+/, '')}`;
-      }
-      
-      console.log('Initiating download from:', brochureUrl);
-      
-      // Create a temporary link and trigger download
-      const link = document.createElement('a');
-      link.href = brochureUrl;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      link.download = `${project.title || 'project'}-brochure.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      showSuccess('Opening brochure...');
+
     } catch (error) {
       console.error('Brochure form submission error:', error);
-      showError(error.message || 'Failed to submit form. Please try again.');
+      showError(error?.data?.message || error.message || 'Failed to submit form. Please try again.');
 
       // Close loading toast on error
       if (loadingToast && typeof loadingToast.close === 'function') {
@@ -555,6 +529,7 @@ const ProjectDetail = () => {
                     onChange={(e) => setBrochureFormData(prev => ({ ...prev, name: e.target.value }))}
                     placeholder="Enter your full name"
                     required
+                    maxLength="50"
                   />
                 </div>
 

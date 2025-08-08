@@ -65,7 +65,7 @@ const Header = () => {
                     {companyName ? companyName.split(' ')[0] : 'Elite'}
                   </span>
                   <span className="logo__accent">
-                    {companyName ? companyName.split(' ')[1] || 'Estate' : 'Estate'}
+                    {companyName ? companyName.split(' ')[1]  : 'Estate'}
                   </span>
                 </>
               )}

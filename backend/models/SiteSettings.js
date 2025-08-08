@@ -93,29 +93,9 @@ const siteSettingsSchema = new mongoose.Schema({
     facebookPixelId: String
   },
 
-  // Business Hours
+  // Business Hours (grouped)
   businessHours: {
-    monday: {
-      isOpen: { type: Boolean, default: true },
-      openTime: { type: String, default: '09:00' },
-      closeTime: { type: String, default: '18:00' }
-    },
-    tuesday: {
-      isOpen: { type: Boolean, default: true },
-      openTime: { type: String, default: '09:00' },
-      closeTime: { type: String, default: '18:00' }
-    },
-    wednesday: {
-      isOpen: { type: Boolean, default: true },
-      openTime: { type: String, default: '09:00' },
-      closeTime: { type: String, default: '18:00' }
-    },
-    thursday: {
-      isOpen: { type: Boolean, default: true },
-      openTime: { type: String, default: '09:00' },
-      closeTime: { type: String, default: '18:00' }
-    },
-    friday: {
+    weekdays: {
       isOpen: { type: Boolean, default: true },
       openTime: { type: String, default: '09:00' },
       closeTime: { type: String, default: '18:00' }
@@ -258,6 +238,26 @@ siteSettingsSchema.statics.getSettings = async function() {
     await settings.save();
   }
   
+  // Backward compatibility: migrate legacy per-day business hours to grouped structure
+  try {
+    const bh = settings.businessHours || {};
+    if (!bh.weekdays && (bh.monday || bh.tuesday || bh.wednesday || bh.thursday || bh.friday)) {
+      const source = bh.monday || bh.tuesday || bh.wednesday || bh.thursday || bh.friday || { isOpen: true, openTime: '09:00', closeTime: '18:00' };
+      settings.businessHours = {
+        weekdays: {
+          isOpen: source.isOpen !== undefined ? source.isOpen : true,
+          openTime: source.openTime || '09:00',
+          closeTime: source.closeTime || '18:00',
+        },
+        saturday: bh.saturday || { isOpen: true, openTime: '09:00', closeTime: '18:00' },
+        sunday: bh.sunday || { isOpen: false, openTime: '10:00', closeTime: '16:00' },
+      };
+      await settings.save();
+    }
+  } catch (e) {
+    // no-op: do not block settings retrieval on migration errors
+  }
+
   return settings;
 };
 

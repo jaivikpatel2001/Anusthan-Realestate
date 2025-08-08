@@ -74,16 +74,16 @@ const SettingsForm = ({
             facebookPixelId: settings.seo?.facebookPixelId || ''
           });
           break;
-        case 'business':
+        case 'business': {
+          const bh = settings.businessHours || {};
+          const weekdaysSource = bh.weekdays || bh.monday || { isOpen: true, openTime: '09:00', closeTime: '18:00' };
           setFormData({
-            monday: settings.businessHours?.monday || { isOpen: true, openTime: '09:00', closeTime: '18:00' },
-            tuesday: settings.businessHours?.tuesday || { isOpen: true, openTime: '09:00', closeTime: '18:00' },
-            wednesday: settings.businessHours?.wednesday || { isOpen: true, openTime: '09:00', closeTime: '18:00' },
-            thursday: settings.businessHours?.thursday || { isOpen: true, openTime: '09:00', closeTime: '18:00' },
-            friday: settings.businessHours?.friday || { isOpen: true, openTime: '09:00', closeTime: '18:00' },
-            saturday: settings.businessHours?.saturday || { isOpen: true, openTime: '09:00', closeTime: '18:00' },
-            sunday: settings.businessHours?.sunday || { isOpen: false, openTime: '09:00', closeTime: '18:00' }
+            weekdays: { ...weekdaysSource },
+            saturday: { ...(bh.saturday || { isOpen: true, openTime: '09:00', closeTime: '18:00' }) },
+            sunday: { ...(bh.sunday || { isOpen: false, openTime: '10:00', closeTime: '16:00' }) }
           });
+          break;
+        }
           break;
         case 'integrations':
           setFormData({
@@ -128,8 +128,9 @@ const SettingsForm = ({
         const newData = { ...prev };
         let current = newData;
         for (let i = 0; i < keys.length - 1; i++) {
-          if (!current[keys[i]]) current[keys[i]] = {};
-          current = current[keys[i]];
+          const key = keys[i];
+          current[key] = { ...(current[key] || {}) };
+          current = current[key];
         }
         current[keys[keys.length - 1]] = value;
         return newData;
@@ -545,42 +546,45 @@ const SettingsForm = ({
   );
 
   const renderBusinessHoursForm = () => {
-    const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-    const dayLabels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const groups = [
+      { key: 'weekdays', label: 'Monday to Friday' },
+      { key: 'saturday', label: 'Saturday' },
+      { key: 'sunday', label: 'Sunday' },
+    ];
 
     return (
       <>
-        {days.map((day, index) => (
-          <div key={day} className="business-hours-day">
-            <h4>{dayLabels[index]}</h4>
+        {groups.map(({ key, label }) => (
+          <div key={key} className="business-hours-day">
+            <h4>{label}</h4>
             <div className="form-row">
               <FormField
                 label="Open"
-                name={`${day}.isOpen`}
+                name={`${key}.isOpen`}
                 type="checkbox"
-                value={formData[day]?.isOpen}
+                value={formData[key]?.isOpen}
                 onChange={handleInputChange}
-                error={errors[`${day}.isOpen`]}
+                error={errors[`${key}.isOpen`]}
               />
 
               <FormField
                 label="Open Time"
-                name={`${day}.openTime`}
+                name={`${key}.openTime`}
                 type="time"
-                value={formData[day]?.openTime}
+                value={formData[key]?.openTime}
                 onChange={handleInputChange}
-                error={errors[`${day}.openTime`]}
-                disabled={!formData[day]?.isOpen}
+                error={errors[`${key}.openTime`]}
+                disabled={!formData[key]?.isOpen}
               />
 
               <FormField
                 label="Close Time"
-                name={`${day}.closeTime`}
+                name={`${key}.closeTime`}
                 type="time"
-                value={formData[day]?.closeTime}
+                value={formData[key]?.closeTime}
                 onChange={handleInputChange}
-                error={errors[`${day}.closeTime`]}
-                disabled={!formData[day]?.isOpen}
+                error={errors[`${key}.closeTime`]}
+                disabled={!formData[key]?.isOpen}
               />
             </div>
           </div>

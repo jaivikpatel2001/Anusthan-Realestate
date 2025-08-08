@@ -53,13 +53,9 @@ const initialState = {
     ogImage: null,
   },
 
-  // Business Hours
+  // Business Hours (grouped)
   businessHours: {
-    monday: { isOpen: true, openTime: '09:00', closeTime: '18:00' },
-    tuesday: { isOpen: true, openTime: '09:00', closeTime: '18:00' },
-    wednesday: { isOpen: true, openTime: '09:00', closeTime: '18:00' },
-    thursday: { isOpen: true, openTime: '09:00', closeTime: '18:00' },
-    friday: { isOpen: true, openTime: '09:00', closeTime: '18:00' },
+    weekdays: { isOpen: true, openTime: '09:00', closeTime: '18:00' },
     saturday: { isOpen: true, openTime: '09:00', closeTime: '18:00' },
     sunday: { isOpen: false, openTime: '10:00', closeTime: '16:00' },
   },
@@ -76,6 +72,7 @@ const initialState = {
   integrations: {
     googleMaps: {
       isEnabled: false,
+      apiKey: '',
     },
     whatsapp: {
       businessNumber: '',
