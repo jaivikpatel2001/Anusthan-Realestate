@@ -156,7 +156,7 @@ const Header = () => {
                   transition={{ delay: 0.5 }}
                 >
                   <Link to="/contact" className="btn btn-primary" onClick={closeMenu}>
-                    Get Quote
+                    CONTACT US
                   </Link>
                 </motion.div>
               </nav>
