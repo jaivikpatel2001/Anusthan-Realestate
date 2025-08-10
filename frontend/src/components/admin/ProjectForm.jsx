@@ -9,7 +9,7 @@ const ProjectForm = ({
   onSubmit, 
   onCancel, 
   isLoading = false,
-  showSubmitButton = true // New prop to control submit button visibility
+  showActions = true
 }) => {
   const { showError, showSuccess } = useToast();
   const token = useSelector(selectCurrentToken);
@@ -175,7 +175,7 @@ const ProjectForm = ({
     if (!formData.location.trim()) newErrors.location = 'Location is required';
     if (!formData.category) newErrors.category = 'Category is required';
     if (!formData.status) newErrors.status = 'Status is required';
-    if (!formData.heroImage.trim()) newErrors.heroImage = 'Hero image is required';
+    
 
     // Numeric validations
     if (formData.startingPrice && formData.startingPrice < 0) {
@@ -712,22 +712,24 @@ const ProjectForm = ({
               helpText="Upload an image file (JPG, PNG, WebP). Maximum size: 10MB"
             />
 
-            {formData.heroImage && (
+                        {formData.heroImage && (
               <div className="uploaded-image-preview">
-                <img
-                  src={formData.heroImage}
-                  alt="Hero image preview"
-                  className="image-preview"
-                />
+                <div style={{ position: 'relative', display: 'inline-block' }}>
+                  <img
+                    src={formData.heroImage}
+                    alt="Hero image preview"
+                    className="image-preview"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, heroImage: '' }))}
+                    className="remove-hero-image-btn"
+                    title="Remove hero image"
+                  >
+                    ×
+                  </button>
+                </div>
                 <p className="image-url">Uploaded: {formData.heroImage}</p>
-                <button
-                  type="button"
-                  onClick={() => setFormData(prev => ({ ...prev, heroImage: '' }))}
-                  className="remove-image-btn"
-                  title="Remove hero image"
-                >
-                  ×
-                </button>
               </div>
             )}
           </div>
@@ -1337,16 +1339,16 @@ const ProjectForm = ({
         </div>
       </div>
 
-      <div className="form-actions">
-        <button
-          type="button"
-          className="btn btn-secondary"
-          onClick={onCancel}
-          disabled={isLoading}
-        >
-          Cancel
-        </button>
-        {showSubmitButton && (
+            {showActions && (
+        <div className="form-actions">
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={onCancel}
+            disabled={isLoading}
+          >
+            Cancel
+          </button>
           <button
             type="submit"
             className="btn btn-primary"
@@ -1354,8 +1356,8 @@ const ProjectForm = ({
           >
             {isLoading ? 'Saving...' : (project ? 'Update Project' : 'Create Project')}
           </button>
-        )}
-      </div>
+        </div>
+      )}
     </form>
   );
 };

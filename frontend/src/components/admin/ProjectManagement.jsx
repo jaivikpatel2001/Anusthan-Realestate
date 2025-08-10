@@ -308,7 +308,7 @@ const ProjectManagement = () => {
           onSubmit={handleCreateProject}
           onCancel={() => setShowCreateModal(false)}
           isLoading={createLoading}
-          showSubmitButton={false}
+          showActions={false}
         />
       </FormModal>
 
@@ -332,7 +332,7 @@ const ProjectManagement = () => {
             setSelectedProject(null);
           }}
           isLoading={updateLoading}
-          showSubmitButton={false}
+          showActions={false}
         />
       </FormModal>
 
