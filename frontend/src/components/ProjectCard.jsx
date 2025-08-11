@@ -179,7 +179,7 @@ const ProjectCard = ({ project, index, inView, onClick, showViewDetails = false 
             <span className="price-value">
               {formatPrice(project.startingPrice)}
               {project.maxPrice && project.maxPrice !== project.startingPrice &&
-                ` - ${formatPrice(project.maxPrice)}`
+                ` - ${formatPrice(project.maxPrice) +' Cr.'}`
               }
             </span>
           </div>
