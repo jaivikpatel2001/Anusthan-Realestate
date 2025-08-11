@@ -1,13 +1,5 @@
 import { apiSlice } from './apiSlice';
-
-const createImageUrl = (path) => {
-  if (!path) return null;
-  const baseUrl = import.meta.env.VITE_IMAGE_URL || 'http://localhost:5000';
-  if (path.startsWith(baseUrl)) {
-    return path;
-  }
-  return `${baseUrl}${path}`;
-};
+import { createImageUrl } from '../../utils/urlUtils';
 
 export const projectsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({

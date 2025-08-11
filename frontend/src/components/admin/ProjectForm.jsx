@@ -363,7 +363,11 @@ const ProjectForm = ({
         if (response.ok && result.success) {
           if (result.data && result.data.length > 0) {
             // Update the heroImage field with the uploaded image URL
-            const imageUrl = `${import.meta.env.VITE_IMAGE_URL || 'http://localhost:5000'}${result.data[0].url}`;
+            const rawUrl = result.data[0].url;
+            // Check if URL is already a full URL (Cloudinary) or needs base URL prepended
+            const imageUrl = rawUrl.startsWith('http')
+              ? rawUrl
+              : `${import.meta.env.VITE_IMAGE_URL || 'http://localhost:5000'}${rawUrl}`;
             setFormData(prev => ({
               ...prev,
               heroImage: imageUrl
@@ -455,12 +459,20 @@ const ProjectForm = ({
       if (response.ok && result.success) {
         if (result.data && result.data.length > 0) {
           // Add new images to existing images
-          const newImages = result.data.map(img => ({
-            url: `${import.meta.env.VITE_IMAGE_URL || 'http://localhost:5000'}${img.url}`,
-            publicId: img.publicId,
-            caption: '',
-            isHero: false
-          }));
+          const newImages = result.data.map(img => {
+            const rawUrl = img.url;
+            // Check if URL is already a full URL (Cloudinary) or needs base URL prepended
+            const imageUrl = rawUrl.startsWith('http')
+              ? rawUrl
+              : `${import.meta.env.VITE_IMAGE_URL || 'http://localhost:5000'}${rawUrl}`;
+
+            return {
+              url: imageUrl,
+              publicId: img.publicId,
+              caption: '',
+              isHero: false
+            };
+          });
 
           setFormData(prev => ({
             ...prev,
@@ -538,7 +550,12 @@ const ProjectForm = ({
 
       if (response.ok && result.success) {
         if (result.data) {
-          const brochureUrl = `${import.meta.env.VITE_IMAGE_URL || 'http://localhost:5000'}${result.data.url}`;
+          const rawUrl = result.data.url;
+          // Check if URL is already a full URL (Cloudinary) or needs base URL prepended
+          const brochureUrl = rawUrl.startsWith('http')
+            ? rawUrl
+            : `${import.meta.env.VITE_IMAGE_URL || 'http://localhost:5000'}${rawUrl}`;
+
           setFormData(prev => ({
             ...prev,
             brochure: {

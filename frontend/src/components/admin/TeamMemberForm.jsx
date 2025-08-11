@@ -61,6 +61,7 @@ const TeamMemberForm = ({
     if (initialData) {
       const getFullImageUrl = (url) => {
         if (!url) return '';
+        // If it's already a full URL (Cloudinary or other external service), return as is
         if (url.startsWith('http') || url.startsWith('blob:')) return url;
         return `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${url}`;
       };

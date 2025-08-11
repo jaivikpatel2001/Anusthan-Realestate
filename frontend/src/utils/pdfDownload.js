@@ -16,7 +16,7 @@ export const downloadPDF = (url, filename, showError = null) => {
       url = String(url);
     }
     
-    // Handle relative URLs
+    // Handle relative URLs (only if not already a full URL)
     if (!url.startsWith('http') && !url.startsWith('blob:')) {
       // Remove any leading slashes to prevent double slashes
       const cleanPath = url.replace(/^\/+/, '');

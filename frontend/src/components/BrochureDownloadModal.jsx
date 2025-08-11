@@ -100,8 +100,9 @@ const BrochureDownloadModal = () => {
       if (brochureUrl) {
         try {
           // Ensure we have a proper URL (handle both relative and absolute)
-          const fullBrochureUrl = brochureUrl.startsWith('http') 
-            ? brochureUrl 
+          // If it's already a full URL (Cloudinary), use as is, otherwise prepend base URL
+          const fullBrochureUrl = brochureUrl.startsWith('http')
+            ? brochureUrl
             : `${import.meta.env.VITE_IMAGE_URL || 'http://localhost:5000'}${brochureUrl.startsWith('/') ? '' : '/'}${brochureUrl}`;
             
           console.log('Attempting to download from URL:', fullBrochureUrl);
