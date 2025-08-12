@@ -69,6 +69,8 @@ const ProjectDetail = () => {
     }
   };
 
+
+
   const getExpectedCompletion = () => {
     if (project?.timeline?.expectedCompletion) {
       return new Date(project.timeline.expectedCompletion).getFullYear();
@@ -214,8 +216,8 @@ const ProjectDetail = () => {
       {/* Hero Section */}
       <section className="project-hero">
         <div className="hero-background">
-          <img 
-            src={heroImage} 
+          <img
+            src={heroImage}
             alt={project.title}
             className="hero-image"
           />
@@ -257,13 +259,13 @@ const ProjectDetail = () => {
               </p>
 
               <div className="hero-actions">
-                <button 
+                <Link
+                  to="/contact"
                   className="contact-btn primary"
-                  onClick={() => setShowContactForm(true)}
                 >
                   <FiPhone size={18} />
                   Contact Us
-                </button>
+                </Link>
                 
                 {project.brochure?.url && (
                   <button
@@ -298,161 +300,219 @@ const ProjectDetail = () => {
             transition={{ duration: 0.8 }}
           >
             {/* Key Information */}
-            <div className="detail-card">
+            <div className="key-information-card">
               <h3>Key Information</h3>
-              <div className="detail-items">
-                <div className="detail-item">
-                  <FiHome size={20} />
-                  <div>
-                    <span className="label">Total Units</span>
-                    <span className="value">{project.totalUnits || 'N/A'}</span>
+              <div className="key-info-grid">
+                {project.totalUnits && (
+                  <div className="key-info-item">
+                    <span className="info-label">Total Units:</span>
+                    <span className="info-value">{project.totalUnits}</span>
                   </div>
-                </div>
-
-                <div className="detail-item">
-                  <FiHome size={20} />
-                  <div>
-                    <span className="label">Available Units</span>
-                    <span className="value">{project.availableUnits || 'N/A'}</span>
+                )}
+                {project.availableUnits && (
+                  <div className="key-info-item">
+                    <span className="info-label">Available Units:</span>
+                    <span className="info-value">{project.availableUnits}</span>
                   </div>
-                </div>
-                
-                <div className="detail-item">
-                  <FiCalendar size={20} />
-                  <div>
-                    <span className="label">
-                      {project.status === 'completed' ? 'Completed' : 'Expected Completion'}
+                )}
+                {getExpectedCompletion() && (
+                  <div className="key-info-item">
+                    <span className="info-label">
+                      {project.status === 'completed' ? 'Completed' : 'Expected Completion:'}
                     </span>
-                    <span className="value">{getExpectedCompletion()}</span>
+                    <span className="info-value">{getExpectedCompletion()}</span>
                   </div>
-                </div>
-                
-                <div className="detail-item">
-                  <FiTrendingUp size={20} />
-                  <div>
-                    <span className="label">Price Range</span>
-                    <span className="value">
+                )}
+                {project.startingPrice && (
+                  <div className="key-info-item">
+                    <span className="info-label">Price Range:</span>
+                    <span className="info-value">
                       {formatPrice(project.startingPrice)}
-                      {project.maxPrice && project.maxPrice !== project.startingPrice && 
-                        ` - ${formatPrice(project.maxPrice)}`
+                      {project.maxPrice && project.maxPrice !== project.startingPrice &&
+                        ` - ${formatPrice(project.maxPrice)} Cr.`
                       }
                     </span>
                   </div>
-                </div>
-
+                )}
                 {project.status === 'ongoing' && project.progress !== undefined && (
-                  <div className="detail-item">
-                    <div className="progress-info">
-                      <span className="label">Construction Progress</span>
-                      <div className="progress-bar">
-                        <div 
-                          className="progress-fill"
-                          style={{ width: `${project.progress}%` }}
-                        />
-                      </div>
-                      <span className="value">{project.progress}%</span>
-                    </div>
+                  <div className="key-info-item">
+                    <span className="info-label">Construction Progress:</span>
+                    <span className="info-value">{project.progress}%</span>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Project Images Gallery */}
-            {project.images && project.images.length > 0 && (
-              <div className="detail-card images-gallery">
-                <div className="gallery-header">
-                  <h3>
-                    
-                    Project Gallery
-                  </h3>
-                  <button
-                    className="view-all-btn"
-                    onClick={() => openImageGallery(0)}
-                  >
-                    View All ({project.images.length + 1})
-                  </button>
-                </div>
-
-                <div className="images-preview">
-                  <div className="main-image" onClick={() => openImageGallery(0)}>
-                    <img
-                      src={project.heroImage}
-                      alt={`${project.title} - Hero`}
-                      className="preview-image"
-                    />
-                    <div className="image-overlay">
-                      <FiImage size={24} />
-                      <span>View Gallery</span>
-                    </div>
-                  </div>
-
-                  <div className="thumbnail-grid">
-                    {project.images.slice(0, 4).map((image, index) => (
-                      <div
-                        key={index}
-                        className="thumbnail-item"
-                        onClick={() => openImageGallery(index + 1)}
-                      >
-                        <img
-                          src={image.url}
-                          alt={`${project.title} - Image ${index + 1}`}
-                          className="thumbnail-image"
-                        />
-                        {index === 3 && project.images.length > 4 && (
-                          <div className="more-images-overlay">
-                            +{project.images.length - 3}
-                          </div>
-                        )}
+      {/* Unit Types & Specifications */}
+      {(project.unitTypes?.length > 0 || project.specifications) && (
+        <section className="project-specs-section">
+          <div className="container">
+            <motion.div
+              className="specs-content"
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              {project.unitTypes?.length > 0 && (
+                <div className="unit-types-section">
+                  <h3>Available Unit Types</h3>
+                  <div className="unit-types-grid">
+                    {project.unitTypes.map((unitType, index) => (
+                      <div key={index} className="unit-type-card">
+                        <span className="unit-type-name">{unitType}</span>
                       </div>
                     ))}
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Amenities */}
-            {project.amenities && project.amenities.length > 0 && (
-              <div className="detail-card">
-                <h3>Amenities</h3>
-                <div className="amenities-grid">
-                  {project.amenities.map((amenity, index) => (
-                    <div key={index} className="amenity-item">
-                      <div>
-                        <h4>{amenity.name}</h4>
+              {project.specifications && (
+                <div className="specifications-section">
+                  <h3>Project Specifications</h3>
+                  <div className="specs-grid">
+                    {project.specifications.totalFloors && (
+                      <div className="spec-card">
+                        <div className="spec-value">{project.specifications.totalFloors}</div>
+                        <div className="spec-label">Total Floors</div>
                       </div>
+                    )}
+                    {project.specifications.parkingSpaces && (
+                      <div className="spec-card">
+                        <div className="spec-value">{project.specifications.parkingSpaces}</div>
+                        <div className="spec-label">Parking Spaces</div>
+                      </div>
+                    )}
+                    {project.specifications.elevators && (
+                      <div className="spec-card">
+                        <div className="spec-value">{project.specifications.elevators}</div>
+                        <div className="spec-label">Elevators</div>
+                      </div>
+                    )}
+                    {project.specifications.landArea && (
+                      <div className="spec-card">
+                        <div className="spec-value">{project.specifications.landArea.toLocaleString()}</div>
+                        <div className="spec-label">Land Area (Sq Ft)</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          </div>
+        </section>
+      )}
+
+      {/* Amenities & Features */}
+      {(project.amenities?.length > 0 || project.features?.length > 0) && (
+        <section className="amenities-features-section">
+          <div className="container">
+            <motion.div
+              className="amenities-features-content"
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+            >
+              {project.amenities?.length > 0 && (
+                <div className="amenities-section">
+                  <h3>Amenities</h3>
+                  <div className="amenities-grid">
+                    {project.amenities.map((amenity, index) => (
+                      <div key={index} className="amenity-card">
+                        <span className="amenity-name">{amenity.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {project.features?.length > 0 && (
+                <div className="features-section">
+                  <h3>Key Features</h3>
+                  <div className="features-grid">
+                    {project.features.map((feature, index) => (
+                      <div key={index} className="feature-card">
+                        <span className="feature-name">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {project.specifications?.approvals?.length > 0 && (
+                <div className="approvals-section">
+                  <h3>Approvals & Certifications</h3>
+                  <div className="approvals-grid">
+                    {project.specifications.approvals.map((approval, index) => (
+                      <div key={index} className="approval-card">
+                        <span className="approval-name">{approval}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          </div>
+        </section>
+      )}
+
+      {/* Project Gallery */}
+      {project.images?.length > 0 && (
+        <section className="project-gallery-section">
+          <div className="container">
+            <motion.div
+              className="gallery-content"
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+            >
+              <div className="gallery-header">
+                <h3>Project Gallery</h3>
+                <button
+                  className="view-all-btn"
+                  onClick={() => openImageGallery(0)}
+                >
+                  View All ({project.images.length + 1})
+                </button>
+              </div>
+
+              <div className="gallery-grid">
+                <div className="main-image" onClick={() => openImageGallery(0)}>
+                  <img
+                    src={project.heroImage}
+                    alt={`${project.title} - Hero`}
+                    className="gallery-image"
+                  />
+                  <div className="image-overlay">
+                    <FiImage size={24} />
+                    <span>View Gallery</span>
+                  </div>
+                </div>
+
+                <div className="thumbnail-grid">
+                  {project.images.slice(0, 4).map((image, index) => (
+                    <div
+                      key={index}
+                      className="thumbnail-item"
+                      onClick={() => openImageGallery(index + 1)}
+                    >
+                      <img
+                        src={image.url}
+                        alt={`${project.title} - Image ${index + 1}`}
+                        className="thumbnail-image"
+                      />
+                      {index === 3 && project.images.length > 4 && (
+                        <div className="more-images-count">
+                          +{project.images.length - 4}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
               </div>
-            )}
-
-            {/* Features */}
-            {project.features && project.features.length > 0 && (
-              <div className="detail-card">
-                <h3>Features</h3>
-                <div className="features-list">
-                  {project.features.map((feature, index) => (
-                    <span key={index} className="feature-tag">
-                      {feature}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Unit Types */}
-            {project.unitTypes && project.unitTypes.length > 0 && (
-              <div className="detail-card">
-                <h3>Available Unit Types</h3>
-                <div className="unit-types-list">
-                  {project.unitTypes.map((unitType, index) => (
-                    <span key={index} className="unit-type-tag">
-                      {unitType}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
+            </motion.div>
+          </div>
+        </section>
+      )}
           </motion.div>
         </div>
       </section>
@@ -587,6 +647,8 @@ const ProjectDetail = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+
     </main>
   );
 };

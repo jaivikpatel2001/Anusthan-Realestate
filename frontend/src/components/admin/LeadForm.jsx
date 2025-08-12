@@ -147,6 +147,14 @@ const LeadForm = ({
     if (formData.budget.max && formData.budget.max < 0) {
       newErrors['budget.max'] = 'Maximum budget cannot be negative';
     }
+
+    // Budget range validation - both min and max required if one is provided
+    if (formData.budget.min && !formData.budget.max) {
+      newErrors['budget.max'] = 'Maximum budget is required when minimum budget is provided';
+    }
+    if (formData.budget.max && !formData.budget.min) {
+      newErrors['budget.min'] = 'Minimum budget is required when maximum budget is provided';
+    }
     if (formData.budget.min && formData.budget.max && Number(formData.budget.min) > Number(formData.budget.max)) {
       newErrors['budget.max'] = 'Maximum budget must be greater than minimum budget';
     }

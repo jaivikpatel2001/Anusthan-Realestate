@@ -1,9 +1,12 @@
 import { motion } from 'framer-motion';
 import Lottie from 'lottie-react';
 import buildingAnimation from '../assets/Building _ Construction.json';
+import { useSettings } from '../hooks/useSettings';
 import '../styles/LottiePreloader.css';
 
 const LottiePreloader = () => {
+  const { companyName, companyTagline } = useSettings();
+
   return (
     <div className="lottie-preloader">
       <motion.div
@@ -27,8 +30,12 @@ const LottiePreloader = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.6 }}
         >
-          <h2 className="preloader-title">Elite Estate</h2>
-          <p className="preloader-subtitle">Building Your Dreams</p>
+          <h2 className="preloader-title">
+            {companyName || 'Elite Estate'}
+          </h2>
+          <p className="preloader-subtitle">
+            {companyTagline || 'Building Your Dreams'}
+          </p>
           
           <motion.div
             className="loading-bar"

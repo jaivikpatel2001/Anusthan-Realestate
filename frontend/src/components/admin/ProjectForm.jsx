@@ -163,6 +163,17 @@ const ProjectForm = ({
     if (formData.maxPrice && formData.maxPrice < 0) {
       newErrors.maxPrice = 'Max price cannot be negative';
     }
+
+    // Price range validation - both min and max required if one is provided
+    if (formData.startingPrice && !formData.maxPrice) {
+      newErrors.maxPrice = 'Maximum price is required when starting price is provided';
+    }
+    if (formData.maxPrice && !formData.startingPrice) {
+      newErrors.startingPrice = 'Starting price is required when maximum price is provided';
+    }
+    if (formData.startingPrice && formData.maxPrice && Number(formData.startingPrice) > Number(formData.maxPrice)) {
+      newErrors.maxPrice = 'Maximum price must be greater than or equal to starting price';
+    }
     if (formData.totalUnits && formData.totalUnits < 1) {
       newErrors.totalUnits = 'Total units must be at least 1';
     }
@@ -173,13 +184,7 @@ const ProjectForm = ({
       newErrors.progress = 'Progress must be between 0 and 100';
     }
 
-    // Coordinate validations
-    if (formData.coordinates.latitude && (formData.coordinates.latitude < -90 || formData.coordinates.latitude > 90)) {
-      newErrors['coordinates.latitude'] = 'Latitude must be between -90 and 90';
-    }
-    if (formData.coordinates.longitude && (formData.coordinates.longitude < -180 || formData.coordinates.longitude > 180)) {
-      newErrors['coordinates.longitude'] = 'Longitude must be between -180 and 180';
-    }
+
 
     // Email validation
     if (formData.developer.email && !/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(formData.developer.email)) {
@@ -208,10 +213,6 @@ const ProjectForm = ({
       totalUnits: formData.totalUnits ? Number(formData.totalUnits) : undefined,
       availableUnits: formData.availableUnits ? Number(formData.availableUnits) : undefined,
       progress: Number(formData.progress),
-      coordinates: {
-        latitude: formData.coordinates.latitude ? Number(formData.coordinates.latitude) : undefined,
-        longitude: formData.coordinates.longitude ? Number(formData.coordinates.longitude) : undefined
-      },
       specifications: {
         ...formData.specifications,
         totalFloors: formData.specifications.totalFloors ? Number(formData.specifications.totalFloors) : undefined,
@@ -934,7 +935,7 @@ const ProjectForm = ({
           <h3>Amenities</h3>
 
           <div className="amenity-input">
-            <div className="form-row">
+            <div>
               <FormField
                 label="Amenity Name"
                 name="amenityName"
@@ -954,7 +955,7 @@ const ProjectForm = ({
             </div>
           </div>
 
-          <div className="amenity-items">
+          <div className="unit-type-items">
             {formData.amenities.map((amenity, index) => (
               <div key={index} className="amenity-item">
                 <div className="amenity-content">
@@ -978,7 +979,7 @@ const ProjectForm = ({
           <h3>Unit Types</h3>
 
           <div className="unit-type-input">
-            <div className="form-row">
+            <div >
               <FormField
                 label="Unit Type"
                 name="unitType"

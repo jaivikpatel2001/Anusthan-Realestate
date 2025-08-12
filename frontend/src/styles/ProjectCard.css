@@ -153,8 +153,12 @@
 
 /* Project Details */
 .project-details {
-  border-top: 1px solid var(--border-primary);
-  padding-top: var(--space-4);
+      display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin-bottom: var(--space-6);
+    gap: var(--space-4);
+    padding-top: var(--space-4);
+        border-top: 1px solid var(--border-primary);
 }
 
 .detail-row {

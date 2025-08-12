@@ -196,6 +196,14 @@ const ApartmentForm = ({
     if (formData.floor.max && formData.floor.max < 0) {
       newErrors['floor.max'] = 'Maximum floor cannot be negative';
     }
+
+    // Floor range validation - both min and max required if one is provided
+    if (formData.floor.min && !formData.floor.max) {
+      newErrors['floor.max'] = 'Maximum floor is required when minimum floor is provided';
+    }
+    if (formData.floor.max && !formData.floor.min) {
+      newErrors['floor.min'] = 'Minimum floor is required when maximum floor is provided';
+    }
     if (formData.floor.min && formData.floor.max && Number(formData.floor.min) > Number(formData.floor.max)) {
       newErrors['floor.max'] = 'Maximum floor must be greater than or equal to minimum floor';
     }

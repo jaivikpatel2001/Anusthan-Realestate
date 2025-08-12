@@ -1,7 +1,10 @@
 import { motion } from 'framer-motion';
+import { useSettings } from '../hooks/useSettings';
 import '../styles/LoadingSpinner.css';
 
 const LoadingSpinner = () => {
+  const { companyName } = useSettings();
+
   return (
     <div className="loading-spinner">
       <motion.div
@@ -21,7 +24,7 @@ const LoadingSpinner = () => {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
       >
-        Loading Elite Estate...
+        Loading...
       </motion.p>
     </div>
   );
