@@ -154,6 +154,8 @@ const ProjectForm = ({
     if (!formData.location.trim()) newErrors.location = 'Location is required';
     if (!formData.category) newErrors.category = 'Category is required';
     if (!formData.status) newErrors.status = 'Status is required';
+    if (!formData.totalUnits || formData.totalUnits === '') newErrors.totalUnits = 'Total units is required';
+    if (!formData.availableUnits || formData.availableUnits === '') newErrors.availableUnits = 'Available units is required';
     
 
     // Numeric validations
@@ -858,6 +860,7 @@ const ProjectForm = ({
               onChange={handleInputChange}
               error={errors.totalUnits}
               placeholder="Total units"
+              required
             />
 
             <FormField
@@ -869,6 +872,7 @@ const ProjectForm = ({
               onChange={handleInputChange}
               error={errors.availableUnits}
               placeholder="Available units"
+              required
             />
           </div>
 

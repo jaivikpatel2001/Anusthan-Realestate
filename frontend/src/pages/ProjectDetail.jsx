@@ -31,6 +31,14 @@ const ProjectDetail = () => {
   const navigate = useNavigate();
   const { showSuccess, showError } = useToast();
 
+  // Helper function to check if specifications have any data
+  const hasSpecifications = (specs) => {
+    if (!specs) return false;
+    return specs.totalFloors || specs.parkingSpaces || specs.elevators ||
+           specs.constructionArea || specs.landArea ||
+           (specs.approvals && specs.approvals.length > 0);
+  };
+
 
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -350,7 +358,7 @@ const ProjectDetail = () => {
             </div>
 
       {/* Unit Types & Specifications */}
-      {(project.unitTypes?.length > 0 || project.specifications) && (
+      {(project.unitTypes?.length > 0 || hasSpecifications(project.specifications)) && (
         <section className="project-specs-section">
           <div className="container">
             <motion.div
@@ -359,7 +367,7 @@ const ProjectDetail = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              {project.specifications && (
+              {hasSpecifications(project.specifications) && (
                 <div className="specifications-section">
                   <h3>Project Specifications</h3>
                   <div className="specs-grid">
