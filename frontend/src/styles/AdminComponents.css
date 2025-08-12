@@ -1128,6 +1128,43 @@
   line-height: 1.4;
 }
 
+/* Unit Type Styles */
+.unit-type-input {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.unit-type-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.unit-type-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--glass-bg);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-full);
+  transition: var(--transition-fast);
+}
+
+.unit-type-item:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--border-secondary);
+}
+
+.unit-type-name {
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: 0.9em;
+}
+
 /* Image Upload Section */
 .image-upload-section {
   display: flex;

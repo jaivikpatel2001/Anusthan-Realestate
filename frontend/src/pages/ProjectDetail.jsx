@@ -308,6 +308,14 @@ const ProjectDetail = () => {
                     <span className="value">{project.totalUnits || 'N/A'}</span>
                   </div>
                 </div>
+
+                <div className="detail-item">
+                  <FiHome size={20} />
+                  <div>
+                    <span className="label">Available Units</span>
+                    <span className="value">{project.availableUnits || 'N/A'}</span>
+                  </div>
+                </div>
                 
                 <div className="detail-item">
                   <FiCalendar size={20} />
@@ -409,12 +417,8 @@ const ProjectDetail = () => {
                 <div className="amenities-grid">
                   {project.amenities.map((amenity, index) => (
                     <div key={index} className="amenity-item">
-                      
                       <div>
                         <h4>{amenity.name}</h4>
-                        {amenity.description && (
-                          <p>{amenity.description}</p>
-                        )}
                       </div>
                     </div>
                   ))}
@@ -430,6 +434,20 @@ const ProjectDetail = () => {
                   {project.features.map((feature, index) => (
                     <span key={index} className="feature-tag">
                       {feature}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Unit Types */}
+            {project.unitTypes && project.unitTypes.length > 0 && (
+              <div className="detail-card">
+                <h3>Available Unit Types</h3>
+                <div className="unit-types-list">
+                  {project.unitTypes.map((unitType, index) => (
+                    <span key={index} className="unit-type-tag">
+                      {unitType}
                     </span>
                   ))}
                 </div>

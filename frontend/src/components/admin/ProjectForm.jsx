@@ -19,17 +19,6 @@ const ProjectForm = ({
     description: '',
     shortDescription: '',
     location: '',
-    address: {
-      street: '',
-      city: '',
-      state: '',
-      zipCode: '',
-      country: 'India'
-    },
-    coordinates: {
-      latitude: '',
-      longitude: ''
-    },
     status: 'upcoming',
     category: 'residential',
     startingPrice: '',
@@ -41,6 +30,7 @@ const ProjectForm = ({
     brochure: null, // Added this field
     features: [],
     amenities: [],
+    unitTypes: [],
     specifications: {
       totalFloors: '',
       parkingSpaces: '',
@@ -73,8 +63,7 @@ const ProjectForm = ({
   const [errors, setErrors] = useState({});
   const [newFeature, setNewFeature] = useState('');
   const [newAmenity, setNewAmenity] = useState('');
-  const [newAmenityIcon, setNewAmenityIcon] = useState('');
-  const [newAmenityDescription, setNewAmenityDescription] = useState('');
+  const [newUnitType, setNewUnitType] = useState('');
   const [newKeyword, setNewKeyword] = useState('');
   const [newApproval, setNewApproval] = useState('');
 
@@ -86,17 +75,6 @@ const ProjectForm = ({
         description: project.description || '',
         shortDescription: project.shortDescription || '',
         location: project.location || '',
-        address: {
-          street: project.address?.street || '',
-          city: project.address?.city || '',
-          state: project.address?.state || '',
-          zipCode: project.address?.zipCode || '',
-          country: project.address?.country || 'India'
-        },
-        coordinates: {
-          latitude: project.coordinates?.latitude || '',
-          longitude: project.coordinates?.longitude || ''
-        },
         status: project.status || 'upcoming',
         category: project.category || 'residential',
         startingPrice: project.startingPrice || '',
@@ -108,6 +86,7 @@ const ProjectForm = ({
         brochure: project.brochure || null, // Populate brochure object
         features: project.features || [],
         amenities: project.amenities || [],
+        unitTypes: project.unitTypes || [],
         specifications: {
           totalFloors: project.specifications?.totalFloors || '',
           parkingSpaces: project.specifications?.parkingSpaces || '',
@@ -293,9 +272,7 @@ const ProjectForm = ({
   const addAmenity = () => {
     if (newAmenity.trim()) {
       const amenityObj = {
-        name: newAmenity.trim(),
-        icon: newAmenityIcon.trim() || undefined,
-        description: newAmenityDescription.trim() || undefined
+        name: newAmenity.trim()
       };
 
       setFormData(prev => ({
@@ -303,10 +280,8 @@ const ProjectForm = ({
         amenities: [...prev.amenities, amenityObj]
       }));
 
-      // Clear the input fields
+      // Clear the input field
       setNewAmenity('');
-      setNewAmenityIcon('');
-      setNewAmenityDescription('');
     }
   };
 
@@ -314,6 +289,24 @@ const ProjectForm = ({
     setFormData(prev => ({
       ...prev,
       amenities: prev.amenities.filter((_, i) => i !== index)
+    }));
+  };
+
+  // Unit type handling functions
+  const addUnitType = () => {
+    if (newUnitType && !formData.unitTypes.includes(newUnitType)) {
+      setFormData(prev => ({
+        ...prev,
+        unitTypes: [...prev.unitTypes, newUnitType]
+      }));
+      setNewUnitType('');
+    }
+  };
+
+  const removeUnitType = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      unitTypes: prev.unitTypes.filter((_, i) => i !== index)
     }));
   };
 
@@ -824,83 +817,7 @@ const ProjectForm = ({
           </div>
         </div>
 
-        {/* Address Information */}
-        <div className="form-section">
-          <h3>Address Details</h3>
 
-          <FormField
-            label="Street Address"
-            name="address.street"
-            value={formData.address.street}
-            onChange={handleInputChange}
-            error={errors['address.street']}
-            placeholder="Street address"
-          />
-
-          <div className="form-row">
-            <FormField
-              label="City"
-              name="address.city"
-              value={formData.address.city}
-              onChange={handleInputChange}
-              error={errors['address.city']}
-              placeholder="City"
-            />
-
-            <FormField
-              label="State"
-              name="address.state"
-              value={formData.address.state}
-              onChange={handleInputChange}
-              error={errors['address.state']}
-              placeholder="State"
-            />
-          </div>
-
-          <div className="form-row">
-            <FormField
-              label="ZIP Code"
-              name="address.zipCode"
-              value={formData.address.zipCode}
-              onChange={handleInputChange}
-              error={errors['address.zipCode']}
-              placeholder="ZIP Code"
-            />
-
-            <FormField
-              label="Country"
-              name="address.country"
-              value={formData.address.country}
-              onChange={handleInputChange}
-              error={errors['address.country']}
-              placeholder="Country"
-            />
-          </div>
-
-          <div className="form-row">
-            <FormField
-              label="Latitude"
-              name="coordinates.latitude"
-              type="number"
-              step="any"
-              value={formData.coordinates.latitude}
-              onChange={handleInputChange}
-              error={errors['coordinates.latitude']}
-              placeholder="Latitude (-90 to 90)"
-            />
-
-            <FormField
-              label="Longitude"
-              name="coordinates.longitude"
-              type="number"
-              step="any"
-              value={formData.coordinates.longitude}
-              onChange={handleInputChange}
-              error={errors['coordinates.longitude']}
-              placeholder="Longitude (-180 to 180)"
-            />
-          </div>
-        </div>
 
         {/* Pricing & Units */}
         <div className="form-section">
@@ -1026,53 +943,83 @@ const ProjectForm = ({
                 placeholder="e.g., Swimming Pool"
                 className="flex-1"
               />
-              <FormField
-                label="Icon (optional)"
-                name="amenityIcon"
-                value={newAmenityIcon}
-                onChange={(name, value) => setNewAmenityIcon(value)}
-                placeholder="e.g., 🏊‍♂️ or icon-class"
-                className="flex-1"
-              />
+              <button
+                type="button"
+                onClick={addAmenity}
+                className="btn btn-secondary"
+                disabled={!newAmenity.trim()}
+              >
+                Add Amenity
+              </button>
             </div>
-
-            <FormField
-              label="Description (optional)"
-              name="amenityDescription"
-              type="textarea"
-              rows={2}
-              value={newAmenityDescription}
-              onChange={(name, value) => setNewAmenityDescription(value)}
-              placeholder="Brief description of the amenity"
-            />
-
-            <button
-              type="button"
-              onClick={addAmenity}
-              className="btn btn-secondary"
-              disabled={!newAmenity.trim()}
-            >
-              Add Amenity
-            </button>
           </div>
 
           <div className="amenity-items">
             {formData.amenities.map((amenity, index) => (
               <div key={index} className="amenity-item">
                 <div className="amenity-content">
-                  <div className="amenity-header">
-                    {amenity.icon && <span className="amenity-icon">{amenity.icon}</span>}
-                    <span className="amenity-name">{amenity.name}</span>
-                  </div>
-                  {amenity.description && (
-                    <p className="amenity-description">{amenity.description}</p>
-                  )}
+                  <span className="amenity-name">{amenity.name}</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => removeAmenity(index)}
                   className="remove-btn"
                   title="Remove amenity"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Unit Types */}
+        <div className="form-section">
+          <h3>Unit Types</h3>
+
+          <div className="unit-type-input">
+            <div className="form-row">
+              <FormField
+                label="Unit Type"
+                name="unitType"
+                type="select"
+                value={newUnitType}
+                onChange={(name, value) => setNewUnitType(value)}
+                options={[
+                  { value: '', label: 'Select unit type' },
+                  { value: '1RK', label: '1 RK' },
+                  { value: '1BHK', label: '1 BHK' },
+                  { value: '2BHK', label: '2 BHK' },
+                  { value: '3BHK', label: '3 BHK' },
+                  { value: '4BHK', label: '4 BHK' },
+                  { value: '5BHK', label: '5 BHK' },
+                  { value: 'Penthouse', label: 'Penthouse' },
+                  { value: 'Studio', label: 'Studio' },
+                  { value: 'Duplex', label: 'Duplex' },
+                  { value: 'Villa', label: 'Villa' }
+                ]}
+                className="flex-1"
+              />
+              <button
+                type="button"
+                onClick={addUnitType}
+                className="btn btn-secondary"
+                disabled={!newUnitType || formData.unitTypes.includes(newUnitType)}
+              >
+                Add Unit Type
+              </button>
+            </div>
+          </div>
+
+          <div className="unit-type-items">
+            {formData.unitTypes.map((unitType, index) => (
+              <div key={index} className="unit-type-item">
+                <span className="unit-type-name">{unitType}</span>
+                <button
+                  type="button"
+                  onClick={() => removeUnitType(index)}
+                  className="remove-btn"
+                  title="Remove unit type"
                 >
                   ×
                 </button>

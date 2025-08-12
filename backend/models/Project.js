@@ -27,28 +27,6 @@ const projectSchema = new mongoose.Schema({
     trim: true,
     maxlength: [100, 'Location cannot exceed 100 characters']
   },
-  address: {
-    street: String,
-    city: String,
-    state: String,
-    zipCode: String,
-    country: {
-      type: String,
-      default: 'India'
-    }
-  },
-  coordinates: {
-    latitude: {
-      type: Number,
-      min: -90,
-      max: 90
-    },
-    longitude: {
-      type: Number,
-      min: -180,
-      max: 180
-    }
-  },
   status: {
     type: String,
     enum: ['upcoming', 'ongoing', 'completed'],
@@ -102,11 +80,14 @@ const projectSchema = new mongoose.Schema({
       type: String,
       required: true,
       trim: true
-    },
-    icon: String,
-    description: String
+    }
   }],
   features: [String],
+  unitTypes: [{
+    type: String,
+    enum: ['1RK', '1BHK', '2BHK', '3BHK', '4BHK', '5BHK', 'Penthouse', 'Studio', 'Duplex', 'Villa'],
+    trim: true
+  }],
   specifications: {
     totalFloors: Number,
     parkingSpaces: Number,
