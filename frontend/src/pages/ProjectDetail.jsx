@@ -340,6 +340,12 @@ const ProjectDetail = () => {
                     <span className="info-value">{project.progress}%</span>
                   </div>
                 )}
+                {project.unitTypes?.length > 0 && (
+                  <div className="key-info-item">
+                    <span className="info-label">Unit Types:</span>
+                    <span className="info-value">{project.unitTypes.join(' / ')}</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -353,19 +359,6 @@ const ProjectDetail = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              {project.unitTypes?.length > 0 && (
-                <div className="unit-types-section">
-                  <h3>Available Unit Types</h3>
-                  <div className="unit-types-grid">
-                    {project.unitTypes.map((unitType, index) => (
-                      <div key={index} className="unit-type-card">
-                        <span className="unit-type-name">{unitType}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
               {project.specifications && (
                 <div className="specifications-section">
                   <h3>Project Specifications</h3>

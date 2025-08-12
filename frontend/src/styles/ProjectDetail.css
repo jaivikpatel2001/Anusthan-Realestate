@@ -341,7 +341,7 @@
 }
 
 .key-information-card h3 {
-  font-size: var(--text-xl);
+  font-size: var(--text-2xl);
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: var(--space-4);

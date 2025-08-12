@@ -61,11 +61,14 @@ const Footer = () => {
     pinterest: <FaPinterest />
   };
 
-  const socialLinks = socialMediaData.map(({ platform, url }) => ({
-    name: platform.charAt(0).toUpperCase() + platform.slice(1),
-    icon: socialIconMap[platform] || <FaFacebook />,
-    url
-  }));
+  const socialLinks = socialMediaData.map(({ platform, url }) => {
+    const safeUrl = url.startsWith('http') ? url : `https://${url}`;
+    return {
+      name: platform.charAt(0).toUpperCase() + platform.slice(1),
+      icon: socialIconMap[platform] || <FaFacebook />,
+      url: safeUrl
+    };
+  });
 
   const quickLinks = [
     { name: 'About Us', url: '#about' },
@@ -139,7 +142,7 @@ const Footer = () => {
                     {companyName ? companyName.split(' ')[0] : 'Elite'}
                   </span>
                   <span className="logo__accent">
-                    {companyName ? companyName.split(' ')[1] || 'Estate' : 'Estate'}
+                    {companyName ? companyName.split(' ')[1]  : 'Estate'}
                   </span>
                 </>
               )}
@@ -275,6 +278,8 @@ const Footer = () => {
                   key={social.name}
                   href={social.url}
                   className="social__link"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   whileHover={{ scale: 1.2, rotate: 5 }}
                   whileTap={{ scale: 0.9 }}
                   initial={{ opacity: 0, scale: 0 }}
