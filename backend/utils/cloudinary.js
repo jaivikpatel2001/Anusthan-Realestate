@@ -23,18 +23,26 @@ if (isCloudinaryConfigured()) {
 }
 
 // Upload file to Cloudinary
-const uploadToCloudinary = async (filePath, folder = 'realstate') => {
+const uploadToCloudinary = async (filePath, folder = 'realstate', options = {}) => {
   try {
     if (!isCloudinaryConfigured()) {
       throw new Error('Cloudinary not configured');
     }
 
-    const result = await cloudinary.uploader.upload(filePath, {
+    // Determine resource type based on file extension
+    const extension = path.extname(filePath).toLowerCase();
+    const isPdf = extension === '.pdf';
+    const resourceType = isPdf ? 'raw' : 'auto';
+
+    const uploadOptions = {
       folder: folder,
-      resource_type: 'auto', // Automatically detect file type
-      quality: 'auto:good', // Optimize quality
-      fetch_format: 'auto', // Optimize format
-    });
+      resource_type: resourceType,
+      quality: 'auto:good',
+      fetch_format: 'auto',
+      ...options
+    };
+
+    const result = await cloudinary.uploader.upload(filePath, uploadOptions);
 
     // Delete local file after successful upload
     if (fs.existsSync(filePath)) {

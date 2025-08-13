@@ -258,7 +258,28 @@ router.post('/brochures', protect, adminOnly, uploadConfigs.brochures.single('br
       });
     }
 
-    const result = await handleFileUpload(req, req.file, 'realstate/brochures');
+    // Ensure the file is a PDF
+    if (req.file.mimetype !== 'application/pdf') {
+      // Delete the uploaded file if it's not a PDF
+      if (req.file.path) {
+        deleteFile(req.file.path);
+      }
+      return res.status(400).json({
+        success: false,
+        message: 'Only PDF files are allowed for brochures'
+      });
+    }
+
+    // Upload to Cloudinary with explicit resource type for PDF
+    const result = await uploadToCloudinary(req.file.path, 'realstate/brochures', {
+      resource_type: 'raw',
+      type: 'upload',
+      format: 'pdf'
+    });
+
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to upload brochure to Cloudinary');
+    }
 
     res.json({
       success: true,
@@ -269,7 +290,8 @@ router.post('/brochures', protect, adminOnly, uploadConfigs.brochures.single('br
         filename: req.file.filename,
         originalName: req.file.originalname,
         size: req.file.size,
-        mimetype: req.file.mimetype
+        mimetype: 'application/pdf',
+        resourceType: result.resourceType
       }
     });
   } catch (error) {
