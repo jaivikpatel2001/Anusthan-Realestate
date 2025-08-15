@@ -63,9 +63,7 @@
     margin: 0 auto;
   }
 
-  .member-image {
-    height: 250px;
-  }
+  
 
   .member-info {
     padding: var(--space-5);

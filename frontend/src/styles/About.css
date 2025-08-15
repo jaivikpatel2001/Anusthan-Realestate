@@ -201,7 +201,7 @@
 
 .team-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: 1fr 1fr 1fr;
   gap: var(--space-8);
 }
 
@@ -461,9 +461,7 @@
     margin: 0 auto;
   }
 
-  .member-image {
-    height: 250px;
-  }
+  
 
   .member-info {
     padding: var(--space-5);
@@ -554,9 +552,7 @@
     max-width: 100%;
   }
 
-  .member-image {
-    height: 220px;
-  }
+  
 
   .member-info {
     padding: var(--space-4);
